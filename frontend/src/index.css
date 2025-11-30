@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for Theme */
+:root {
+  --color-neon-green: #39ff14;
+  --color-neon-cyan: #00ffff;
+  --color-neon-pink: #ff10f0;
+  --color-cyber-dark: #0a0e27;
+  --color-cyber-darker: #050816;
+  --color-cyber-card: #1a1f3a;
+}
+
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background-color: var(--color-cyber-darker);
+  color: #ffffff;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cyber-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-neon-green);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2dd40e;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-neon-green);
+  color: #000;
+}
+
+/* Utility Classes */
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-neon-green via-neon-cyan to-neon-purple;
+  }
+
+  .section-padding {
+    @apply px-4 sm:px-6 lg:px-8 py-16 md:py-24;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Custom Component Styles */
+@layer components {
+  .cyber-button {
+    @apply relative px-6 py-3 font-semibold text-sm uppercase tracking-wider
+           overflow-hidden transition-all duration-300;
+    @apply bg-transparent border-2 border-neon-green text-neon-green;
+    @apply hover:bg-neon-green hover:text-black;
+    @apply before:absolute before:inset-0 before:bg-neon-green before:translate-x-full;
+    @apply before:transition-transform before:duration-300 hover:before:translate-x-0;
+  }
+
+  .cyber-button span {
+    @apply relative z-10;
+  }
+
+  .cyber-card {
+    @apply relative overflow-hidden rounded-lg;
+    @apply bg-gradient-to-br from-cyber-card/50 to-cyber-dark/50;
+    @apply backdrop-blur-md border border-white/10;
+    @apply transition-all duration-300;
+    @apply hover:border-neon-green/50 hover:shadow-lg hover:shadow-neon-green/20;
+  }
+
+  .neon-text {
+    @apply text-neon-green;
+    text-shadow: 0 0 10px var(--color-neon-green),
+      0 0 20px var(--color-neon-green), 0 0 30px var(--color-neon-green);
+  }
+
+  .cyber-input {
+    @apply w-full px-4 py-3 rounded-lg;
+    @apply bg-cyber-card/50 border-2 border-white/10;
+    @apply text-white placeholder-white/50;
+    @apply focus:border-neon-green focus:outline-none;
+    @apply transition-colors duration-300;
+  }
+
+  .section-title {
+    @apply text-4xl md:text-5xl font-bold mb-4 text-gradient;
+  }
+}
+
+/* Animations */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+.scanline-effect::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-neon-green),
+    transparent
+  );
+  animation: scanline 8s linear infinite;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* Loading Animation */
+.loading-spinner {
+  border: 3px solid rgba(57, 255, 20, 0.1);
+  border-top-color: var(--color-neon-green);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Particle Container */
+#tsparticles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+/* Dark Mode Adjustments */
+.dark {
+  --color-cyber-dark: #0a0e27;
+  --color-cyber-darker: #050816;
+}
+
+.light {
+  --color-cyber-dark: #f0f0f0;
+  --color-cyber-darker: #ffffff;
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus Visible */
+*:focus-visible {
+  outline: 2px solid var(--color-neon-green);
+  outline-offset: 2px;
+}
