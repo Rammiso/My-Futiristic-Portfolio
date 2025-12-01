@@ -1,50 +1,159 @@
-# Dependencies
+# ==================== DEPENDENCIES ====================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
-# Environment variables
+# ==================== ENVIRONMENT VARIABLES (CRITICAL) ====================
 .env
 .env.local
 .env.production
 .env.development
+.env.test
+.env.staging
+.env.backup
+*.env
+backend/.env
+frontend/.env
 
-# Build outputs
+# ==================== BUILD OUTPUTS ====================
 frontend/dist/
 frontend/build/
 backend/dist/
 backend/build/
+*.tsbuildinfo
 
-# IDE
+# ==================== LOGS ====================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ==================== TESTING ====================
+coverage/
+.nyc_output/
+*.lcov
+.jest/
+
+# ==================== IDE / EDITORS ====================
 .vscode/
+!.vscode/extensions.json
 .idea/
+*.swp
+*~swo
+*~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+.vs/
+
+# ==================== OS FILES ====================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ==================== UPLOADS & USER GENERATED CONTENT ====================
+backend/uploads/
+backend/public/uploads/
+frontend/public/uploads/
+*.pdf
+*.doc
+*.docx
+# Keep example files
+!backend/uploads/.gitkeep
+!backend/public/uploads/.gitkeep
+
+# ==================== DATABASE ====================
+*.sqlite
+*.sqlite3
+*.db
+data/
+mongodb_data/
+
+# ==================== CACHE ====================
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist/
+.temp/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ==================== SENSITIVE / SECURITY ====================
+# Private keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+
+# SSL certificates
+ssl/
+certs/
+
+# Auth tokens
+.npmrc
+.yarnrc
+
+# Secrets
+secrets/
+*.secret
+
+# ==================== TEMPORARY FILES ====================
+*.tmp
+*.temp
+*.bak
 *.swp
 *.swo
 *~
+.tmp/
+tmp/
 
-# OS
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Logs
-logs/
-*.log
-
-# Temp files
-*.tmp
-.cache/
-
-# Upload directories
-backend/uploads/
-backend/public/uploads/
-
-# Testing
-coverage/
-.nyc_output/
-
-# Misc
-.env.backup
+# ==================== MISC ====================
 *.orig
+.vercel
+.netlify
+
+# ==================== PROJECT SPECIFIC ====================
+# AI Playground temp files
+backend/ai-temp/
+frontend/ai-temp/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Markdown files (keep only README.md)
+*.md
+!README.md
+!**/README.md
+
+# ==================== KEEP THESE FILES ====================
+# We want to keep .env.example files for documentation
+!.env.example
+!backend/.env.example
+!frontend/.env.example
