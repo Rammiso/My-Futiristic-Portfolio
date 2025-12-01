@@ -261,7 +261,7 @@ const Skills = () => {
         { name: "JavaScript", proficiency: 92, icon: "📜" },
         { name: "TailwindCSS", proficiency: 90, icon: "🎨" },
         { name: "Framer Motion", proficiency: 88, icon: "🎬" },
-        { name: "Three.js", proficiency: 82, icon: "🎲" },
+        { name: "Three.js", proficiency: 62, icon: "🎲" },
         { name: "HTML5/CSS3", proficiency: 95, icon: "🌐" },
       ],
     },
@@ -272,7 +272,7 @@ const Skills = () => {
       skills: [
         { name: "Node.js", proficiency: 93, icon: "🟢" },
         { name: "Express.js", proficiency: 90, icon: "🚂" },
-        { name: "MongoDB", proficiency: 88, icon: "🍃" },
+        { name: "MongoDB", proficiency: 80, icon: "🍃" },
         { name: "REST APIs", proficiency: 92, icon: "🔌" },
         { name: "JWT Auth", proficiency: 85, icon: "🔐" },
         { name: "Mongoose", proficiency: 87, icon: "🦡" },
@@ -286,8 +286,8 @@ const Skills = () => {
         { name: "Git & GitHub", proficiency: 90, icon: "📦" },
         { name: "VS Code", proficiency: 95, icon: "💻" },
         { name: "Postman", proficiency: 88, icon: "📮" },
-        { name: "Figma", proficiency: 80, icon: "🎨" },
-        { name: "Docker", proficiency: 75, icon: "🐳" },
+        { name: "Figma", proficiency: 60, icon: "🎨" },
+        // { name: "Docker", proficiency: 75, icon: "🐳" },
         { name: "Vercel/Netlify", proficiency: 85, icon: "🚀" },
       ],
     },
@@ -298,8 +298,8 @@ const Skills = () => {
       skills: [
         { name: "OpenAI API", proficiency: 85, icon: "🧠" },
         { name: "Prompt Engineering", proficiency: 88, icon: "💬" },
-        { name: "Vector DBs", proficiency: 75, icon: "🔢" },
-        { name: "LangChain", proficiency: 78, icon: "⛓️" },
+        // { name: "Vector DBs", proficiency: 75, icon: "🔢" },
+        // { name: "LangChain", proficiency: 78, icon: "⛓️" },
       ],
     },
   ];
@@ -396,7 +396,7 @@ const Skills = () => {
             {[
               { label: "Technologies", value: "20+", color: "#39FF14" },
               { label: "Years Experience", value: "3+", color: "#00FFFF" },
-              { label: "Projects Built", value: "50+", color: "#FF10F0" },
+              { label: "Projects Built", value: "10+", color: "#FF10F0" },
               { label: "Learning", value: "Always", color: "#FFA500" },
             ].map((stat, i) => (
               <Card

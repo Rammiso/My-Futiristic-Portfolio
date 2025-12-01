@@ -33,9 +33,10 @@ const AdminLogin = () => {
     try {
       setLoading(true);
       const response = await api.post("/admin/login", credentials);
-      const { token, user } = response.data;
-      login(token, user);
+      const { accessToken, user } = response.data;
+      login(accessToken, user);
       toast.success("Login successful!");
+      navigate("/admin/dashboard");
     } catch (error) {
       toast.error(error || "Invalid credentials");
       console.error(error);

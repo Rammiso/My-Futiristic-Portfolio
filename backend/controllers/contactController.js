@@ -6,7 +6,7 @@ import sendEmail from "../config/email.js";
 // @access  Public (with rate limiting)
 export const submitContact = async (req, res, next) => {
   try {
-    const { name, email, phone, message } = req.body;
+    const { name, email, subject, message } = req.body;
 
     // Validate required fields
     if (!name || !email || !message) {
@@ -24,40 +24,77 @@ export const submitContact = async (req, res, next) => {
     const contact = await Contact.create({
       name,
       email,
-      phone,
+      subject: subject || "",
       message,
       ip,
     });
 
     // Send email notification to admin
     try {
+      const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+
       await sendEmail({
-        to: process.env.EMAIL_USER,
-        subject: `New Contact Form Submission from ${name}`,
+        to: adminEmail,
+        subject: `New Contact: ${subject || "No Subject"} - from ${name}`,
         text: `
-          You have a new contact form submission:
+You have a new contact form submission:
 
-          Name: ${name}
-          Email: ${email}
-          Phone: ${phone || "Not provided"}
-          
-          Message:
-          ${message}
+Name: ${name}
+Email: ${email}
+Subject: ${subject || "No Subject"}
 
-          ---
-          Submitted at: ${new Date().toLocaleString()}
+Message:
+${message}
+
+---
+Submitted at: ${new Date().toLocaleString()}
+IP Address: ${ip}
         `,
         html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-          <p><strong>Phone:</strong> ${phone || "Not provided"}</p>
-          <p><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, "<br>")}</p>
-          <hr>
-          <p><small>Submitted at: ${new Date().toLocaleString()}</small></p>
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px 10px 0 0; }
+    .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 10px 10px; }
+    .field { margin-bottom: 15px; }
+    .label { font-weight: bold; color: #667eea; }
+    .message-box { background: white; padding: 15px; border-left: 4px solid #667eea; margin-top: 10px; }
+    .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2 style="margin:0;">💌 New Contact Form Submission</h2>
+    </div>
+    <div class="content">
+      <div class="field">
+        <span class="label">Name:</span> ${name}
+      </div>
+      <div class="field">
+        <span class="label">Email:</span> <a href="mailto:${email}">${email}</a>
+      </div>
+      <div class="field">
+        <span class="label">Subject:</span> ${subject || "No Subject"}
+      </div>
+      <div class="field">
+        <span class="label">Message:</span>
+        <div class="message-box">${message.replace(/\n/g, "<br>")}</div>
+      </div>
+      <div class="footer">
+        Submitted at: ${new Date().toLocaleString()}<br>
+        IP Address: ${ip}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
         `,
       });
+      console.log(`✉️ Contact form notification sent to ${adminEmail}`);
     } catch (emailError) {
       console.error("Failed to send email notification:", emailError);
       // Don't fail the request if email fails

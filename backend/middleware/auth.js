@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
 // Protect routes - verify JWT token
 export const protect = async (req, res, next) => {
@@ -24,8 +25,18 @@ export const protect = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Add user from payload to request
-    req.user = decoded;
+    // Get user from database and attach to request
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found. Token is invalid.",
+      });
+    }
+
+    // Add user to request object
+    req.user = user;
 
     next();
   } catch (error) {
@@ -36,9 +47,16 @@ export const protect = async (req, res, next) => {
   }
 };
 
-// Admin role check (optional - use after protect middleware)
+// Admin role check (use after protect middleware)
 export const adminOnly = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: "Authentication required.",
+    });
+  }
+
+  if (req.user.role === "admin") {
     next();
   } else {
     return res.status(403).json({

@@ -189,12 +189,12 @@ const Navbar = ({ theme, toggleTheme }) => {
               ))}
 
               {/* Desktop Theme Toggle */}
-              <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} />
+              {/* <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} /> */}
             </div>
 
             {/* Mobile Menu Button */}
             <div className="lg:hidden flex items-center gap-4">
-              <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} />
+              {/* <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} /> */}
 
               <motion.button
                 whileTap={{ scale: 0.9 }}
@@ -388,65 +388,65 @@ const Navbar = ({ theme, toggleTheme }) => {
 };
 
 // Theme Toggle Button Component
-const ThemeToggleButton = ({ theme, toggleTheme }) => {
-  return (
-    <motion.button
-      onClick={toggleTheme}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className="relative p-3 glass border border-neon-cyan/30 rounded-lg hover:border-neon-cyan/60 transition-colors group overflow-hidden"
-      aria-label="Toggle theme"
-    >
-      {/* Background Glow */}
-      <motion.div
-        animate={{
-          opacity: [0.3, 0.6, 0.3],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute inset-0 bg-gradient-to-br from-neon-cyan/20 to-neon-green/20 blur"
-      />
+// const ThemeToggleButton = ({ theme, toggleTheme }) => {
+//   return (
+//     <motion.button
+//       onClick={toggleTheme}
+//       whileHover={{ scale: 1.05 }}
+//       whileTap={{ scale: 0.95 }}
+//       className="relative p-3 glass border border-neon-cyan/30 rounded-lg hover:border-neon-cyan/60 transition-colors group overflow-hidden"
+//       aria-label="Toggle theme"
+//     >
+//       {/* Background Glow */}
+//       <motion.div
+//         animate={{
+//           opacity: [0.3, 0.6, 0.3],
+//         }}
+//         transition={{
+//           duration: 2,
+//           repeat: Infinity,
+//           ease: "easeInOut",
+//         }}
+//         className="absolute inset-0 bg-gradient-to-br from-neon-cyan/20 to-neon-green/20 blur"
+//       />
 
-      {/* Icon Container */}
-      <div className="relative w-5 h-5">
-        <AnimatePresence mode="wait">
-          {theme === "dark" ? (
-            <motion.div
-              key="moon"
-              initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-              animate={{ rotate: 0, opacity: 1, scale: 1 }}
-              exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-              transition={{ duration: 0.3 }}
-              className="absolute inset-0"
-            >
-              <IoMoon className="w-5 h-5 text-neon-cyan drop-shadow-[0_0_8px_rgba(0,255,255,0.8)]" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="sun"
-              initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
-              animate={{ rotate: 0, opacity: 1, scale: 1 }}
-              exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
-              transition={{ duration: 0.3 }}
-              className="absolute inset-0"
-            >
-              <IoSunny className="w-5 h-5 text-neon-yellow drop-shadow-[0_0_8px_rgba(255,255,0,0.8)]" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+//       {/* Icon Container */}
+//       <div className="relative w-5 h-5">
+//         <AnimatePresence mode="wait">
+//           {theme === "dark" ? (
+//             <motion.div
+//               key="moon"
+//               initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+//               animate={{ rotate: 0, opacity: 1, scale: 1 }}
+//               exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
+//               transition={{ duration: 0.3 }}
+//               className="absolute inset-0"
+//             >
+//               <IoMoon className="w-5 h-5 text-neon-cyan drop-shadow-[0_0_8px_rgba(0,255,255,0.8)]" />
+//             </motion.div>
+//           ) : (
+//             <motion.div
+//               key="sun"
+//               initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
+//               animate={{ rotate: 0, opacity: 1, scale: 1 }}
+//               exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
+//               transition={{ duration: 0.3 }}
+//               className="absolute inset-0"
+//             >
+//               <IoSunny className="w-5 h-5 text-neon-yellow drop-shadow-[0_0_8px_rgba(255,255,0,0.8)]" />
+//             </motion.div>
+//           )}
+//         </AnimatePresence>
+//       </div>
 
-      {/* Rotating Ring */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-        className="absolute inset-0 border border-neon-cyan/20 rounded-lg"
-      />
-    </motion.button>
-  );
-};
+//       {/* Rotating Ring */}
+//       <motion.div
+//         animate={{ rotate: 360 }}
+//         transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+//         className="absolute inset-0 border border-neon-cyan/20 rounded-lg"
+//       />
+//     </motion.button>
+//   );
+// };
 
 export default Navbar;

@@ -1,8 +1,8 @@
 import express from "express";
 import {
+  createProject,
   getProjects,
   getProject,
-  createProject,
   updateProject,
   deleteProject,
 } from "../controllers/projectController.js";
@@ -12,9 +12,9 @@ const router = express.Router();
 
 // Public routes
 router.get("/", getProjects);
-router.get("/:id", getProject);
+router.get("/:identifier", getProject); // Can use slug or ID
 
-// Admin routes (protected)
+// Admin-only routes (require authentication)
 router.post("/", protect, createProject);
 router.put("/:id", protect, updateProject);
 router.delete("/:id", protect, deleteProject);

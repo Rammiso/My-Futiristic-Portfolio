@@ -5,6 +5,11 @@ import helmet from "helmet";
 import morgan from "morgan";
 import connectDB from "./config/db.js";
 import errorHandler from "./middleware/errorHandler.js";
+import {
+  sanitizeMongo,
+  sanitizeXSS,
+  sanitizeInput,
+} from "./middleware/sanitize.js";
 
 // Import routes
 import authRoutes from "./routes/auth.js";
@@ -22,17 +27,48 @@ connectDB();
 // Initialize Express app
 const app = express();
 
-// Middleware
-app.use(helmet()); // Security headers
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true,
-  })
-);
-app.use(morgan("dev")); // Logging
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+// Trust proxy - Important for rate limiting and getting real IP behind proxies (Heroku, Render, etc.)
+app.set("trust proxy", 1);
+
+// Security Middleware
+app.use(helmet()); // Adds various HTTP headers for security
+
+// CORS Configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = process.env.CLIENT_URL
+      ? process.env.CLIENT_URL.split(",").map((url) => url.trim())
+      : ["http://localhost:5173"];
+
+    // Allow requests with no origin (like mobile apps, Postman, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+
+// Logging
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev")); // Detailed logging in development
+} else {
+  app.use(morgan("combined")); // Standard Apache combined log in production
+}
+
+// Body Parser Middleware
+app.use(express.json({ limit: "10mb" })); // Parse JSON bodies
+app.use(express.urlencoded({ extended: true, limit: "10mb" })); // Parse URL-encoded bodies
+
+// Data Sanitization Middleware
+app.use(sanitizeMongo); // Prevent MongoDB injection attacks
+app.use(sanitizeXSS); // Prevent XSS attacks
+app.use(sanitizeInput); // Custom input trimming and validation
 
 // API Routes
 app.use("/api/admin", authRoutes);
@@ -47,6 +83,23 @@ app.get("/api/health", (req, res) => {
     success: true,
     message: "Server is running!",
     timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || "development",
+  });
+});
+
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "🚀 Musab Portfolio API - Futuristic Backend",
+    version: "1.0.0",
+    endpoints: {
+      health: "/api/health",
+      admin: "/api/admin",
+      projects: "/api/projects",
+      contact: "/api/contact",
+      ai: "/api/ai",
+    },
   });
 });
 
@@ -65,7 +118,9 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(
-    `🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`
+    `🚀 Server running on port ${PORT} in ${
+      process.env.NODE_ENV || "development"
+    } mode`
   );
 });
 

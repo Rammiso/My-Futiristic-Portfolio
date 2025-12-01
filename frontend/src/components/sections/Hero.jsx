@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense, memo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Text, Box, Sphere, Torus } from "@react-three/drei";
 import { IoDownload, IoMail, IoArrowForward } from "react-icons/io5";
@@ -8,107 +8,117 @@ import Button from "@components/ui/Button.jsx";
 import { RESUME_URL } from "@utils/constants.js";
 import * as THREE from "three";
 
-// Sound Effects
-const useSound = () => {
-  const hoverSound = useRef(null);
-  const clickSound = useRef(null);
+// ==================== PERFORMANCE UTILITIES ====================
 
-  useEffect(() => {
-    hoverSound.current = new Audio(
-      "data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
+// Global singleton to store canvas instance
+let canvasInstanceGlobal = null;
+
+// Device performance detection
+const detectDevicePerformance = () => {
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
     );
-    hoverSound.current.volume = 0.3;
+  const memory = navigator.deviceMemory || 4;
+  const cores = navigator.hardwareConcurrency || 2;
+  const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
 
-    clickSound.current = new Audio(
-      "data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
-    );
-    clickSound.current.volume = 0.4;
-  }, []);
+  // GPU detection via canvas
+  const canvas = document.createElement("canvas");
+  const gl =
+    canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+  const debugInfo = gl?.getExtension("WEBGL_debug_renderer_info");
+  const renderer = debugInfo
+    ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+    : "";
 
-  const playHover = () => {
-    if (hoverSound.current) {
-      hoverSound.current.currentTime = 0;
-      hoverSound.current.play().catch(() => {});
-    }
-  };
-
-  const playClick = () => {
-    if (clickSound.current) {
-      clickSound.current.currentTime = 0;
-      clickSound.current.play().catch(() => {});
-    }
-  };
-
-  return { playHover, playClick };
+  // Categorize device
+  if (isMobile || memory < 4 || cores < 4) {
+    return { tier: "low", scale: 0.4, nodes: 10, fps: 30 };
+  } else if (renderer.includes("Apple") || renderer.includes("Mali")) {
+    return { tier: "medium", scale: 0.7, nodes: 20, fps: 45 };
+  } else {
+    return { tier: "high", scale: 1, nodes: 30, fps: 60 };
+  }
 };
 
-// Orbiting Tech Logo Component
-const OrbitingLogo = ({
-  position,
-  orbitSpeed,
-  logoText,
-  color,
-  orbitRadius,
-}) => {
-  const meshRef = useRef();
-  const textRef = useRef();
+const devicePerf = detectDevicePerformance();
 
-  useFrame((state) => {
-    if (meshRef.current) {
-      const time = state.clock.elapsedTime * orbitSpeed;
-      meshRef.current.position.x = Math.cos(time) * orbitRadius + position[0];
-      meshRef.current.position.y = Math.sin(time * 0.5) * 0.5 + position[1];
-      meshRef.current.position.z = Math.sin(time) * orbitRadius + position[2];
+// ==================== OPTIMIZED 3D COMPONENTS ====================
 
-      meshRef.current.rotation.y = time * 0.5;
-      meshRef.current.rotation.x = Math.sin(time * 0.3) * 0.2;
+// Memoized Orbiting Logo (reduced calculations)
+const OrbitingLogo = memo(
+  ({ position, orbitSpeed, logoText, color, orbitRadius, qualityTier }) => {
+    const meshRef = useRef();
+    const textRef = useRef();
+    let frameCount = 0;
 
-      // Pulsing glow
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
-      meshRef.current.scale.set(pulse, pulse, pulse);
-    }
+    useFrame((state) => {
+      // Skip frames on low-end devices
+      if (qualityTier === "low" && frameCount++ % 2 !== 0) return;
 
-    if (textRef.current && meshRef.current) {
-      textRef.current.position.copy(meshRef.current.position);
-      textRef.current.lookAt(state.camera.position);
-    }
-  });
+      if (meshRef.current) {
+        const time = state.clock.elapsedTime * orbitSpeed;
+        meshRef.current.position.x = Math.cos(time) * orbitRadius + position[0];
+        meshRef.current.position.y = Math.sin(time * 0.5) * 0.5 + position[1];
+        meshRef.current.position.z = Math.sin(time) * orbitRadius + position[2];
+        meshRef.current.rotation.y = time * 0.5;
+        meshRef.current.rotation.x = Math.sin(time * 0.3) * 0.2;
 
-  return (
-    <group>
-      <mesh ref={meshRef}>
-        <boxGeometry args={[0.6, 0.6, 0.6]} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.8}
-          transparent
-          opacity={0.7}
-          wireframe
-        />
-      </mesh>
-      <Text
-        ref={textRef}
-        fontSize={0.15}
-        color={color}
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.02}
-        outlineColor="#000000"
-      >
-        {logoText}
-      </Text>
-    </group>
-  );
-};
+        // Reduced pulse calculation
+        if (qualityTier !== "low") {
+          const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
+          meshRef.current.scale.setScalar(pulse);
+        }
+      }
 
-// Network Graph Component
-const NetworkGraph = ({ mouseX, mouseY }) => {
+      if (textRef.current && meshRef.current) {
+        textRef.current.position.copy(meshRef.current.position);
+        textRef.current.lookAt(state.camera.position);
+      }
+    });
+
+    return (
+      <group>
+        <mesh ref={meshRef}>
+          <boxGeometry args={[0.6, 0.6, 0.6]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={color}
+            emissiveIntensity={qualityTier === "low" ? 0.4 : 0.8}
+            transparent
+            opacity={0.7}
+            wireframe
+          />
+        </mesh>
+        {qualityTier !== "low" && (
+          <Text
+            ref={textRef}
+            fontSize={0.15}
+            color={color}
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.02}
+            outlineColor="#000000"
+          >
+            {logoText}
+          </Text>
+        )}
+      </group>
+    );
+  }
+);
+
+OrbitingLogo.displayName = "OrbitingLogo";
+
+// Optimized Network Graph
+const NetworkGraph = memo(({ mouseX, mouseY, qualityTier }) => {
   const groupRef = useRef();
   const nodesRef = useRef([]);
   const linesRef = useRef([]);
+  let frameCount = 0;
 
-  const nodeCount = 30;
+  const nodeCount = devicePerf.nodes;
   const [nodePositions] = useState(() => {
     const positions = [];
     for (let i = 0; i < nodeCount; i++) {
@@ -127,98 +137,107 @@ const NetworkGraph = ({ mouseX, mouseY }) => {
   });
 
   useFrame((state) => {
+    // Adaptive FPS
+    if (qualityTier === "low" && frameCount++ % 2 !== 0) return;
+    if (qualityTier === "medium" && frameCount++ % 3 === 0) return;
+
     if (groupRef.current) {
       groupRef.current.rotation.y = state.clock.elapsedTime * 0.05;
       groupRef.current.rotation.x =
         Math.sin(state.clock.elapsedTime * 0.1) * 0.1;
-
-      // Apply mouse parallax
       groupRef.current.position.x = mouseX * 0.2;
       groupRef.current.position.y = mouseY * 0.2;
     }
 
-    // Animate nodes
-    nodesRef.current.forEach((node, i) => {
-      if (node) {
-        const pulse =
-          1 +
-          Math.sin(state.clock.elapsedTime * 2 + nodePositions[i].pulseOffset) *
-            0.3;
-        node.scale.set(pulse, pulse, pulse);
-      }
-    });
-
-    // Animate connection lines opacity
-    linesRef.current.forEach((line, i) => {
-      if (line) {
-        const fade = 0.3 + Math.sin(state.clock.elapsedTime + i * 0.5) * 0.3;
-        line.material.opacity = fade;
-      }
-    });
+    // Simplified animation for low-end
+    if (qualityTier === "high") {
+      nodesRef.current.forEach((node, i) => {
+        if (node) {
+          const pulse =
+            1 +
+            Math.sin(
+              state.clock.elapsedTime * 2 + nodePositions[i].pulseOffset
+            ) *
+              0.3;
+          node.scale.setScalar(pulse);
+        }
+      });
+    }
   });
 
   return (
     <group ref={groupRef}>
-      {/* Nodes */}
       {nodePositions.map((pos, i) => (
         <mesh
           key={`node-${i}`}
           position={[pos.x, pos.y, pos.z]}
           ref={(el) => (nodesRef.current[i] = el)}
         >
-          <sphereGeometry args={[0.08, 8, 8]} />
+          <sphereGeometry
+            args={[
+              0.08,
+              qualityTier === "low" ? 4 : 8,
+              qualityTier === "low" ? 4 : 8,
+            ]}
+          />
           <meshStandardMaterial
             color="#00FFFF"
             emissive="#00FFFF"
-            emissiveIntensity={1.5}
+            emissiveIntensity={qualityTier === "low" ? 0.8 : 1.5}
             transparent
             opacity={0.8}
           />
         </mesh>
       ))}
 
-      {/* Connection Lines */}
-      {nodePositions.map((pos1, i) =>
-        nodePositions.slice(i + 1).map((pos2, j) => {
-          const distance = Math.sqrt(
-            Math.pow(pos1.x - pos2.x, 2) +
-              Math.pow(pos1.y - pos2.y, 2) +
-              Math.pow(pos1.z - pos2.z, 2)
-          );
-
-          if (distance < 2.5) {
-            const points = [
-              new THREE.Vector3(pos1.x, pos1.y, pos1.z),
-              new THREE.Vector3(pos2.x, pos2.y, pos2.z),
-            ];
-            const lineGeometry = new THREE.BufferGeometry().setFromPoints(
-              points
+      {/* Only show lines on medium/high devices */}
+      {qualityTier !== "low" &&
+        nodePositions.map((pos1, i) =>
+          nodePositions.slice(i + 1).map((pos2, j) => {
+            const distance = Math.sqrt(
+              Math.pow(pos1.x - pos2.x, 2) +
+                Math.pow(pos1.y - pos2.y, 2) +
+                Math.pow(pos1.z - pos2.z, 2)
             );
 
-            return (
-              <line
-                key={`line-${i}-${j}`}
-                geometry={lineGeometry}
-                ref={(el) => linesRef.current.push(el)}
-              >
-                <lineBasicMaterial
-                  color="#39FF14"
-                  transparent
-                  opacity={0.4}
-                  linewidth={1}
-                />
-              </line>
-            );
-          }
-          return null;
-        })
-      )}
+            if (distance < 2.5 && Math.random() > 0.7) {
+              // Reduce connections
+              const points = [
+                new THREE.Vector3(pos1.x, pos1.y, pos1.z),
+                new THREE.Vector3(pos2.x, pos2.y, pos2.z),
+              ];
+              const lineGeometry = new THREE.BufferGeometry().setFromPoints(
+                points
+              );
+
+              return (
+                <line
+                  key={`line-${i}-${j}`}
+                  geometry={lineGeometry}
+                  ref={(el) => linesRef.current.push(el)}
+                >
+                  <lineBasicMaterial
+                    color="#39FF14"
+                    transparent
+                    opacity={0.4}
+                    linewidth={1}
+                  />
+                </line>
+              );
+            }
+            return null;
+          })
+        )}
     </group>
   );
-};
+});
 
-// Holographic Device Component
-const DeviceHologram = ({ position, deviceType, label }) => {
+NetworkGraph.displayName = "NetworkGraph";
+
+// Simplified Device Hologram (only for high-end)
+const DeviceHologram = memo(({ position, deviceType, label, qualityTier }) => {
+  if (qualityTier === "low") return null; // Skip on low-end devices
+
   const meshRef = useRef();
   const textRef = useRef();
   const [flicker, setFlicker] = useState(1);
@@ -229,8 +248,7 @@ const DeviceHologram = ({ position, deviceType, label }) => {
         position[1] + Math.sin(state.clock.elapsedTime + position[0]) * 0.3;
       meshRef.current.rotation.y += 0.005;
 
-      // Random flicker effect
-      if (Math.random() > 0.98) {
+      if (qualityTier === "high" && Math.random() > 0.98) {
         setFlicker(Math.random() * 0.5 + 0.5);
       } else {
         setFlicker(1);
@@ -275,25 +293,28 @@ const DeviceHologram = ({ position, deviceType, label }) => {
           wireframe
         />
       </mesh>
-      <Text
-        ref={textRef}
-        fontSize={0.12}
-        color="#00FFFF"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.01}
-        outlineColor="#000000"
-      >
-        {label}
-      </Text>
+      {qualityTier === "high" && (
+        <Text
+          ref={textRef}
+          fontSize={0.12}
+          color="#00FFFF"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.01}
+          outlineColor="#000000"
+        >
+          {label}
+        </Text>
+      )}
     </group>
   );
-};
+});
 
-// Enhanced Camera Controller
-const CameraController = ({ mouseX, mouseY }) => {
+DeviceHologram.displayName = "DeviceHologram";
+
+// Optimized Camera Controller
+const CameraController = memo(({ mouseX, mouseY }) => {
   useFrame((state) => {
-    // Smooth parallax based on mouse position
     state.camera.position.x = THREE.MathUtils.lerp(
       state.camera.position.x,
       mouseX * 1.2,
@@ -305,7 +326,6 @@ const CameraController = ({ mouseX, mouseY }) => {
       0.03
     );
 
-    // Subtle idle orbit
     const time = state.clock.elapsedTime * 0.1;
     state.camera.position.x += Math.sin(time) * 0.01;
     state.camera.position.z = 6 + Math.cos(time) * 0.2;
@@ -314,44 +334,63 @@ const CameraController = ({ mouseX, mouseY }) => {
   });
 
   return null;
-};
+});
 
-// Main Tech Hologram Scene
-const TechHologramScene = ({ mouseX, mouseY }) => {
+CameraController.displayName = "CameraController";
+
+// Progressive Loading Scene
+const TechHologramScene = memo(({ mouseX, mouseY, isFullQuality }) => {
+  const qualityTier = devicePerf.tier;
+
   const techLogos = [
     { text: "REACT", color: "#00FFFF", radius: 2.5, speed: 0.3 },
     { text: "NODE", color: "#39FF14", radius: 3, speed: 0.25 },
-    { text: "MONGO", color: "#FF10F0", radius: 2.8, speed: 0.35 },
-    { text: "JS", color: "#FFD700", radius: 3.2, speed: 0.2 },
+    ...(isFullQuality
+      ? [
+          { text: "MONGO", color: "#FF10F0", radius: 2.8, speed: 0.35 },
+          { text: "JS", color: "#FFD700", radius: 3.2, speed: 0.2 },
+        ]
+      : []),
   ];
 
-  const devices = [
-    { pos: [2, 1, -2], type: "laptop", label: "DEVICE_LINKED" },
-    { pos: [-2, -1, -1], type: "phone", label: "ONLINE" },
-    { pos: [1.5, -2, 1], type: "server", label: "SERVER_ACTIVE" },
-    { pos: [-1.8, 1.5, 0.5], type: "tablet", label: "CONNECTED" },
-  ];
+  const devices =
+    qualityTier !== "low"
+      ? [
+          { pos: [2, 1, -2], type: "laptop", label: "DEVICE_LINKED" },
+          { pos: [-2, -1, -1], type: "phone", label: "ONLINE" },
+          ...(isFullQuality
+            ? [
+                { pos: [1.5, -2, 1], type: "server", label: "SERVER_ACTIVE" },
+                { pos: [-1.8, 1.5, 0.5], type: "tablet", label: "CONNECTED" },
+              ]
+            : []),
+        ]
+      : [];
 
   return (
     <>
-      {/* Ambient Lighting */}
-      <ambientLight intensity={0.4} color="#0088FF" />
-
-      {/* Dynamic Point Lights */}
-      <pointLight
-        position={[5, 5, 5]}
-        intensity={1.5}
-        color="#00FFFF"
-        distance={15}
-      />
-      <pointLight
-        position={[-5, -5, -5]}
-        intensity={1}
-        color="#39FF14"
-        distance={15}
+      <ambientLight
+        intensity={qualityTier === "low" ? 0.6 : 0.4}
+        color="#0088FF"
       />
 
-      {/* Orbiting Tech Logos */}
+      {qualityTier !== "low" && (
+        <>
+          <pointLight
+            position={[5, 5, 5]}
+            intensity={isFullQuality ? 1.5 : 1}
+            color="#00FFFF"
+            distance={15}
+          />
+          <pointLight
+            position={[-5, -5, -5]}
+            intensity={isFullQuality ? 1 : 0.7}
+            color="#39FF14"
+            distance={15}
+          />
+        </>
+      )}
+
       {techLogos.map((logo, i) => (
         <OrbitingLogo
           key={`logo-${i}`}
@@ -360,52 +399,102 @@ const TechHologramScene = ({ mouseX, mouseY }) => {
           logoText={logo.text}
           color={logo.color}
           orbitRadius={logo.radius}
+          qualityTier={qualityTier}
         />
       ))}
 
-      {/* Network Graph */}
-      <NetworkGraph mouseX={mouseX} mouseY={mouseY} />
+      <NetworkGraph mouseX={mouseX} mouseY={mouseY} qualityTier={qualityTier} />
 
-      {/* Holographic Devices */}
       {devices.map((device, i) => (
         <DeviceHologram
           key={`device-${i}`}
           position={device.pos}
           deviceType={device.type}
           label={device.label}
+          qualityTier={qualityTier}
         />
       ))}
 
-      {/* Central Glow Sphere */}
-      <mesh>
-        <sphereGeometry args={[0.5, 32, 32]} />
-        <meshStandardMaterial
-          color="#00FFFF"
-          emissive="#00FFFF"
-          emissiveIntensity={2}
-          transparent
-          opacity={0.2}
-        />
-      </mesh>
+      {isFullQuality && (
+        <mesh>
+          <sphereGeometry args={[0.5, 32, 32]} />
+          <meshStandardMaterial
+            color="#00FFFF"
+            emissive="#00FFFF"
+            emissiveIntensity={2}
+            transparent
+            opacity={0.2}
+          />
+        </mesh>
+      )}
 
-      {/* Camera Controller */}
       <CameraController mouseX={mouseX} mouseY={mouseY} />
     </>
   );
+});
+
+TechHologramScene.displayName = "TechHologramScene";
+
+// Sound Effects (unchanged)
+const useSound = () => {
+  const hoverSound = useRef(null);
+  const clickSound = useRef(null);
+
+  useEffect(() => {
+    hoverSound.current = new Audio(
+      "data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
+    );
+    hoverSound.current.volume = 0.3;
+
+    clickSound.current = new Audio(
+      "data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
+    );
+    clickSound.current.volume = 0.4;
+  }, []);
+
+  const playHover = () => {
+    if (hoverSound.current) {
+      hoverSound.current.currentTime = 0;
+      hoverSound.current.play().catch(() => {});
+    }
+  };
+
+  const playClick = () => {
+    if (clickSound.current) {
+      clickSound.current.currentTime = 0;
+      clickSound.current.play().catch(() => {});
+    }
+  };
+
+  return { playHover, playClick };
 };
 
-// Main Hero Component
+// ==================== MAIN HERO COMPONENT ====================
+
 const Hero = () => {
   const [text, setText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
+  const [isFullQuality, setIsFullQuality] = useState(false);
   const fullText = "Full Stack Developer | AI Engineer | UI/UX Designer";
   const { playHover, playClick } = useSound();
 
-  // Mouse parallax
+  // In-memory canvas persistence
+  const canvasRef = useRef(null);
+  const sceneLoadedRef = useRef(false);
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const rotateX = useTransform(mouseY, [-0.5, 0.5], [5, -5]);
   const rotateY = useTransform(mouseX, [-0.5, 0.5], [-5, 5]);
+
+  // Progressive loading: lite -> full quality after 1.5s
+  useEffect(() => {
+    const qualityTimer = setTimeout(() => {
+      setIsFullQuality(true);
+    }, 1500);
+
+    return () => clearTimeout(qualityTimer);
+  }, []);
 
   // Typing animation
   useEffect(() => {
@@ -630,27 +719,87 @@ const Hero = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right 3D Scene */}
+          {/* Right 3D Scene - OPTIMIZED WITH IN-MEMORY PERSISTENCE */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
             className="relative h-[400px] lg:h-[500px] hidden md:block"
           >
-            {/* Canvas Container with Glow */}
             <div className="relative w-full h-full rounded-lg overflow-hidden">
-              {/* Glow Effect */}
               <div className="absolute inset-0 bg-gradient-radial from-neon-green/20 via-neon-cyan/10 to-transparent blur-3xl" />
 
-              {/* 3D Canvas */}
-              <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
-                <Suspense fallback={null}>
-                  <TechHologramScene
-                    mouseX={mouseX.get()}
-                    mouseY={mouseY.get()}
-                  />
-                </Suspense>
-              </Canvas>
+              {/* Loading Placeholder - Shows until canvas is ready */}
+              {!isFullQuality && (
+                <motion.div
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: isFullQuality ? 0 : 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0 flex items-center justify-center bg-cyber-card/30 backdrop-blur-sm"
+                >
+                  {/* Animated Loading Indicator */}
+                  <div className="relative">
+                    {/* Pulsing Circle */}
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.5, 0.8, 0.5],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                      className="absolute inset-0 rounded-full border-2 border-neon-green/50 blur-sm"
+                    />
+
+                    {/* Spinning Ring */}
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                      className="w-32 h-32 rounded-full border-t-2 border-r-2 border-neon-cyan/70"
+                    />
+
+                    {/* Center Icon */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-4xl mb-2">⚡</div>
+                        <div className="text-xs font-mono text-neon-green animate-pulse">
+                          Loading 3D Scene...
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* 3D Canvas - LOADS ONCE, PERSISTS IN MEMORY */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isFullQuality ? 1 : 0 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0"
+              >
+                <Canvas
+                  ref={canvasRef}
+                  camera={{ position: [0, 0, 6], fov: 50 }}
+                  dpr={devicePerf.scale} // Adaptive resolution
+                  frameloop="demand" // Only render when needed
+                  performance={{ min: 0.5 }} // Throttle on slow devices
+                >
+                  <Suspense fallback={null}>
+                    <TechHologramScene
+                      mouseX={mouseX.get()}
+                      mouseY={mouseY.get()}
+                      isFullQuality={isFullQuality}
+                    />
+                  </Suspense>
+                </Canvas>
+              </motion.div>
 
               {/* HUD Overlay */}
               <div className="absolute top-4 right-4 p-3 glass-dark border border-neon-cyan/30 rounded backdrop-blur-sm">
@@ -660,13 +809,6 @@ const Hero = () => {
                   <div>SYS: HOLOGRAM_V2</div>
                 </div>
               </div>
-
-              {/* Bottom HUD */}
-              {/* <div className="absolute bottom-4 left-4 p-2 glass-dark border border-neon-green/30 rounded backdrop-blur-sm">
-                <div className="text-xs font-mono text-neon-green">
-                  TECH_STACK_ORBIT
-                </div>
-              </div> */}
 
               {/* Scan Lines Effect */}
               <div className="absolute inset-0 pointer-events-none opacity-10">

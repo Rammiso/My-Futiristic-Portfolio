@@ -1,29 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
+import { useTheme } from "./hooks/useTheme";
 import Home from "./pages/Home.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 
 function App() {
-  const [theme, setTheme] = useState("dark");
-
-  // Load theme from localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    setTheme(savedTheme);
-    document.documentElement.classList.toggle("dark", savedTheme === "dark");
-    document.documentElement.classList.toggle("light", savedTheme === "light");
-  }, []);
-
-  // Toggle theme function
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
-    document.documentElement.classList.toggle("light", newTheme === "light");
-  };
+  // Use centralized theme hook
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

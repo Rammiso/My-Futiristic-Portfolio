@@ -16,8 +16,9 @@ const contactSchema = new mongoose.Schema(
         "Please provide a valid email",
       ],
     },
-    phone: {
+    subject: {
       type: String,
+      trim: true,
       default: "",
     },
     message: {

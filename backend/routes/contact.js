@@ -10,12 +10,12 @@ import { contactLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
-// Public route (rate limited to prevent spam)
+// Public route - Contact form submission (with rate limiting)
 router.post("/", contactLimiter, submitContact);
 
-// Admin routes (protected)
+// Admin-only routes (require authentication)
 router.get("/", protect, getContacts);
-router.patch("/:id", protect, markAsRead);
+router.patch("/:id/read", protect, markAsRead);
 router.delete("/:id", protect, deleteContact);
 
 export default router;
