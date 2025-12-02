@@ -23,8 +23,43 @@ const useHoverSound = () => {
       soundRef.current.play().catch(() => {});
     }
   };
+};
 
-  return playSound;
+// Animated Counter Hook
+const useAnimatedCounter = (end, duration = 2000, inView = false) => {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(false);
+
+  useEffect(() => {
+    if (!inView || countRef.current) return;
+
+    countRef.current = true;
+    let startTime = null;
+    const startValue = 0;
+
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+
+      // Easing function for smooth animation
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const currentCount = Math.floor(
+        easeOutQuart * (end - startValue) + startValue
+      );
+
+      setCount(currentCount);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setCount(end);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [end, duration, inView]);
+
+  return count;
 };
 
 // Orbiting Particles Component
@@ -273,6 +308,29 @@ const HighlightCard = ({ highlight, index, playSound }) => {
 const About = () => {
   const playSound = useHoverSound();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const canvasRef = useRef(null);
+  const sectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Use Intersection Observer to detect visibility
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
 
   const highlights = [
     {
@@ -312,6 +370,7 @@ const About = () => {
 
   return (
     <section
+      ref={sectionRef}
       id="about"
       className="section-padding bg-cyber-dark relative overflow-hidden"
       onMouseMove={handleMouseMove}
@@ -432,7 +491,7 @@ const About = () => {
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-white/10">
                   {[
-                    { label: "Projects", value: "50+" },
+                    { label: "Projects", value: "10+" },
                     { label: "Experience", value: "3+ Yrs" },
                     { label: "Technologies", value: "20+" },
                   ].map((stat, i) => (
@@ -467,17 +526,49 @@ const About = () => {
 
                 {/* 3D Canvas */}
                 <div className="relative w-full h-full rounded-lg overflow-hidden">
-                  {/* Background Glow */}
-                  <div className="absolute inset-0 bg-gradient-radial from-neon-green/10 via-neon-cyan/5 to-transparent blur-2xl" />
+                  {/* Background Placeholder - Your portrait image */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
+                    style={{
+                      backgroundImage: 'url("/src/assets/MUSAB.png")',
+                      filter: "brightness(0.8)",
+                    }}
+                  >
+                    {/* Fallback in case image doesn't load */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-neon-green/20 via-cyber-dark to-neon-cyan/20" />
+                  </div>
 
-                  <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
-                    <Suspense fallback={null}>
-                      <AnimatedPortrait
-                        mouseX={mousePosition.x}
-                        mouseY={mousePosition.y}
-                      />
-                    </Suspense>
-                  </Canvas>
+                  {/* Background Glow - Above placeholder but below Canvas */}
+                  <div className="absolute inset-0 bg-gradient-radial from-neon-green/10 via-neon-cyan/5 to-transparent blur-2xl z-1" />
+
+                  {/* 3D Canvas - Above placeholder */}
+                  <div
+                    className="absolute inset-0 z-10"
+                    style={{
+                      opacity: isVisible ? 1 : 0,
+                      transition: "opacity 0.5s ease-in-out",
+                      pointerEvents: isVisible ? "auto" : "none",
+                    }}
+                  >
+                    <Canvas
+                      ref={canvasRef}
+                      camera={{ position: [0, 0, 6], fov: 50 }}
+                      frameloop={isVisible ? "always" : "never"}
+                      gl={{
+                        preserveDrawingBuffer: true,
+                        antialias: true,
+                        powerPreference: "high-performance",
+                        alpha: true,
+                      }}
+                    >
+                      <Suspense fallback={null}>
+                        <AnimatedPortrait
+                          mouseX={mousePosition.x}
+                          mouseY={mousePosition.y}
+                        />
+                      </Suspense>
+                    </Canvas>
+                  </div>
 
                   {/* Scanlines Overlay */}
                   {/* <div className="absolute inset-0 pointer-events-none opacity-10">

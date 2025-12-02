@@ -1,61 +1,16 @@
-import { motion, useMotionValue, useTransform } from "framer-motion";
-import { useState, useRef, Suspense } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Sphere } from "@react-three/drei";
+import { motion } from "framer-motion";
+import { useState, memo } from "react";
+import { useInView } from "react-intersection-observer";
 import Card from "@components/ui/Card.jsx";
 import { FADE_IN_UP, STAGGER_CONTAINER } from "@utils/constants.js";
-import * as THREE from "three";
 
-// 3D Energy Orb Component
-const EnergyOrb = ({ color, intensity, position, hovered }) => {
-  const meshRef = useRef();
-  const glowRef = useRef();
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.elapsedTime * 0.3;
-      meshRef.current.rotation.y = state.clock.elapsedTime * 0.5;
-
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.1 * intensity;
-      meshRef.current.scale.set(pulse, pulse, pulse);
-    }
-
-    if (glowRef.current) {
-      const glowPulse = hovered
-        ? 1.5
-        : 1 + Math.sin(state.clock.elapsedTime * 1.5) * 0.2;
-      glowRef.current.scale.set(glowPulse, glowPulse, glowPulse);
-    }
-  });
-
-  return (
-    <group position={position}>
-      <Sphere ref={meshRef} args={[0.5, 32, 32]}>
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={intensity * 0.8}
-          roughness={0.2}
-          metalness={0.8}
-        />
-      </Sphere>
-
-      <Sphere ref={glowRef} args={[0.7, 16, 16]}>
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={hovered ? 0.4 : 0.2}
-          wireframe
-        />
-      </Sphere>
-    </group>
-  );
-};
-
-// Skill Card Component
-const SkillCard = ({ skill, index }) => {
+// Optimized Skill Card Component with CSS Glow Effect
+const SkillCard = memo(({ skill, index }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [showOrb, setShowOrb] = useState(false);
+  const [ref, inView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
 
   const getColorByProficiency = (level) => {
     if (level >= 90) return "#39FF14"; // Green
@@ -68,17 +23,12 @@ const SkillCard = ({ skill, index }) => {
 
   return (
     <motion.div
+      ref={ref}
       variants={FADE_IN_UP}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      onHoverStart={() => {
-        setIsHovered(true);
-        setShowOrb(true);
-      }}
-      onHoverEnd={() => {
-        setIsHovered(false);
-      }}
+      animate={inView ? "visible" : "hidden"}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
       className="group relative"
     >
       <motion.div
@@ -91,36 +41,70 @@ const SkillCard = ({ skill, index }) => {
             isHovered ? "border-neon-green/60" : "border-white/10"
           }`}
         >
-          {/* Neon Glow on Hover */}
+          {/* Futuristic Glow Effect on Hover */}
           <motion.div
-            animate={{ opacity: isHovered ? 1 : 0 }}
-            className="absolute inset-0 bg-gradient-radial from-neon-green/20 via-transparent to-transparent blur-xl"
+            animate={{
+              opacity: isHovered ? 1 : 0,
+              scale: isHovered ? 1 : 0.8,
+            }}
+            transition={{ duration: 0.3 }}
+            className="absolute -inset-4 blur-2xl opacity-0"
+            style={{
+              background: `radial-gradient(circle at center, ${color}40, transparent 70%)`,
+            }}
+          />
+
+          {/* Animated Ring Effect */}
+          <motion.div
+            animate={{
+              opacity: isHovered ? [0, 1, 0] : 0,
+              scale: isHovered ? [0.8, 1.2, 1.4] : 0.8,
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: isHovered ? Infinity : 0,
+              ease: "easeOut",
+            }}
+            className="absolute inset-0 rounded-lg"
+            style={{
+              border: `2px solid ${color}`,
+              opacity: 0.3,
+            }}
           />
 
           {/* Corner Brackets */}
           <div className="absolute top-1 left-1 w-3 h-3 border-l border-t border-neon-green/30" />
           <div className="absolute top-1 right-1 w-3 h-3 border-r border-t border-neon-cyan/30" />
 
-          {/* 3D Orb Preview */}
-          {showOrb && (
+          {/* Floating Orb Above Card (CSS Only) */}
+          {isHovered && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              className="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 z-20"
+              initial={{ opacity: 0, y: 10, scale: 0.5 }}
+              animate={{
+                opacity: [0, 1, 1, 0],
+                y: [-10, -60, -60, -80],
+                scale: [0.5, 1, 1, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                times: [0, 0.3, 0.7, 1],
+                ease: "easeOut",
+              }}
+              className="absolute -top-20 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full pointer-events-none z-20"
+              style={{
+                background: `radial-gradient(circle, ${color}FF, ${color}80 40%, transparent 70%)`,
+                boxShadow: `0 0 40px ${color}, 0 0 80px ${color}60, inset 0 0 20px ${color}`,
+                filter: "blur(1px)",
+              }}
             >
-              <Canvas camera={{ position: [0, 0, 3] }}>
-                <Suspense fallback={null}>
-                  <ambientLight intensity={0.5} />
-                  <pointLight position={[5, 5, 5]} intensity={1} />
-                  <EnergyOrb
-                    color={color}
-                    intensity={skill.proficiency / 100}
-                    position={[0, 0, 0]}
-                    hovered={isHovered}
-                  />
-                </Suspense>
-              </Canvas>
+              {/* Inner glow */}
+              <div
+                className="absolute inset-2 rounded-full"
+                style={{
+                  background: `radial-gradient(circle, ${color}FF, transparent)`,
+                  animation: "pulse 1s ease-in-out infinite",
+                }}
+              />
             </motion.div>
           )}
 
@@ -128,18 +112,52 @@ const SkillCard = ({ skill, index }) => {
           <div className="flex items-center gap-3 mb-3 relative z-10">
             <motion.div
               animate={{
-                boxShadow: isHovered ? `0 0 20px ${color}` : `0 0 0px ${color}`,
+                boxShadow: isHovered
+                  ? `0 0 20px ${color}, 0 0 40px ${color}60`
+                  : `0 0 0px ${color}`,
               }}
-              className="w-10 h-10 rounded-lg flex items-center justify-center glass text-2xl"
+              transition={{ duration: 0.3 }}
+              className="w-10 h-10 rounded-lg flex items-center justify-center glass text-2xl relative"
+              style={{
+                background: isHovered
+                  ? `linear-gradient(135deg, ${color}20, transparent)`
+                  : "transparent",
+              }}
             >
               {skill.icon || "⚡"}
+
+              {/* Particle effect */}
+              {isHovered && (
+                <>
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{
+                        opacity: [0, 1, 0],
+                        scale: [0, 1, 0],
+                        x: [0, (i - 1) * 20],
+                        y: [0, -20 - i * 10],
+                      }}
+                      transition={{
+                        duration: 1,
+                        delay: i * 0.1,
+                        repeat: Infinity,
+                        repeatDelay: 0.5,
+                      }}
+                      className="absolute w-1 h-1 rounded-full"
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </>
+              )}
             </motion.div>
             <div className="flex-1">
               <h4 className="text-sm font-bold text-white">{skill.name}</h4>
             </div>
           </div>
 
-          {/* Proficiency Bar */}
+          {/* Proficiency Bar - Optimized */}
           <div className="relative z-10">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs text-white/50 font-mono">LEVEL</span>
@@ -151,17 +169,23 @@ const SkillCard = ({ skill, index }) => {
             <div className="relative h-2 bg-cyber-card/50 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
-                whileInView={{ width: `${skill.proficiency}%` }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, delay: index * 0.05 }}
+                animate={
+                  inView ? { width: `${skill.proficiency}%` } : { width: 0 }
+                }
+                transition={{
+                  duration: 1.5,
+                  delay: index * 0.15,
+                  ease: "easeOut",
+                }}
                 className="absolute inset-y-0 left-0 rounded-full"
                 style={{
                   background: `linear-gradient(90deg, ${color}, ${color}99)`,
                   boxShadow: `0 0 10px ${color}`,
+                  willChange: "width",
                 }}
               />
 
-              {/* Animated Glow */}
+              {/* Animated Shimmer */}
               <motion.div
                 animate={{
                   x: [-20, 200],
@@ -206,9 +230,26 @@ const SkillCard = ({ skill, index }) => {
           </div>
         </Card>
       </motion.div>
+
+      {/* CSS Keyframes for pulse animation */}
+      <style jsx>{`
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 0.6;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.1);
+          }
+        }
+      `}</style>
     </motion.div>
   );
-};
+});
+
+SkillCard.displayName = "SkillCard";
 
 // Category Header Component
 const CategoryHeader = ({ title, icon, color = "#39FF14" }) => {
@@ -287,7 +328,6 @@ const Skills = () => {
         { name: "VS Code", proficiency: 95, icon: "💻" },
         { name: "Postman", proficiency: 88, icon: "📮" },
         { name: "Figma", proficiency: 60, icon: "🎨" },
-        // { name: "Docker", proficiency: 75, icon: "🐳" },
         { name: "Vercel/Netlify", proficiency: 85, icon: "🚀" },
       ],
     },
@@ -298,8 +338,6 @@ const Skills = () => {
       skills: [
         { name: "OpenAI API", proficiency: 85, icon: "🧠" },
         { name: "Prompt Engineering", proficiency: 88, icon: "💬" },
-        // { name: "Vector DBs", proficiency: 75, icon: "🔢" },
-        // { name: "LangChain", proficiency: 78, icon: "⛓️" },
       ],
     },
   ];

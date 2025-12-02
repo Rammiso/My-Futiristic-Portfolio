@@ -24,15 +24,35 @@ const AIPlayground = () => {
 
     try {
       setLoading(true);
-      const response = await api.post("/ai/demo", {
-        type: activeDemo,
+
+      // Use different endpoints for text vs image
+      const endpoint =
+        activeDemo === "text" ? "/ai-playground/text" : "/ai-playground/image";
+
+      const response = await api.post(endpoint, {
         prompt: input,
       });
-      setOutput(response.data.result);
-      toast.success("AI response generated!");
+
+      // Handle different response formats
+      if (activeDemo === "text") {
+        setOutput(response.data.data.generatedText);
+      } else {
+        // For image, store the base64 data URI
+        setOutput(response.data.data.image);
+      }
+
+      toast.success(
+        activeDemo === "text"
+          ? "Text generated successfully!"
+          : "Image generated successfully!"
+      );
     } catch (error) {
-      toast.error(error || "Failed to generate AI response");
-      console.error(error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to generate AI response";
+      toast.error(errorMessage);
+      console.error("AI Playground error:", error);
     } finally {
       setLoading(false);
     }
@@ -49,11 +69,11 @@ const AIPlayground = () => {
     },
     {
       id: "image",
-      name: "Image Prompts",
+      name: "Image Generation",
       icon: <IoImage />,
       placeholder:
         'Describe an image... (e.g., "A futuristic city with neon lights")',
-      description: "Create image descriptions powered by AI",
+      description: "Generate AI images using Stable Diffusion",
     },
   ];
 
@@ -156,11 +176,24 @@ const AIPlayground = () => {
                   className="mt-8 p-6 rounded-lg bg-cyber-card/50 border border-neon-green/30"
                 >
                   <h4 className="text-lg font-semibold text-neon-green mb-3">
-                    AI Response
+                    {activeDemo === "text"
+                      ? "Generated Text"
+                      : "Generated Image"}
                   </h4>
-                  <p className="text-white/80 leading-relaxed whitespace-pre-wrap">
-                    {output}
-                  </p>
+
+                  {activeDemo === "text" ? (
+                    <p className="text-white/80 leading-relaxed whitespace-pre-wrap">
+                      {output}
+                    </p>
+                  ) : (
+                    <div className="flex justify-center">
+                      <img
+                        src={output}
+                        alt="AI Generated"
+                        className="max-w-full h-auto rounded-lg border border-neon-green/20 shadow-lg"
+                      />
+                    </div>
+                  )}
                 </motion.div>
               )}
 

@@ -10,12 +10,11 @@ import { FADE_IN_UP, STAGGER_CONTAINER } from "@utils/constants.js";
 const projectsData = [
   {
     id: 1,
-    title: "MGSA Digital Hub",
-    subtitle: "Community-Driven Educational Platform",
+    title: "Murti Guuto Student Association",
+    subtitle: "Empowering Knowledge. Building Unity. Inspiring Growth.",
     description:
-      "A futuristic community platform engineered for the Murti Guuto Student Association at Haramaya University. Features an advanced academic resources system, collaborative knowledge-sharing hub, student support network, and digital mentorship ecosystem. Built to empower students through unified data structures and real-time collaboration protocols.",
-    image:
-      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80",
+      "A futuristic student platform engineered for the Murti Guuto Student Association at Haramaya University. Features an advanced academic resources system, collaborative knowledge-sharing hub, student support network, and digital mentorship ecosystem. Built to empower students through unified data structures and real-time collaboration protocols.",
+    image: "/Hero.png",
     technologies: ["React", "Node.js", "MongoDB", "TailwindCSS", "Express"],
     category: "Web",
     liveUrl: "https://murti-guutoo-student-association-v1.vercel.app/",
@@ -151,6 +150,10 @@ const ProjectCard = ({ project, index, onClick }) => {
   return (
     <motion.div
       variants={FADE_IN_UP}
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+      layout
       whileHover={{ y: -10, scale: 1.02 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
@@ -391,11 +394,14 @@ const Projects = () => {
 
           {/* Projects Grid */}
           <motion.div
+            key={activeFilter}
             variants={STAGGER_CONTAINER}
+            initial="hidden"
+            animate="visible"
             layout
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
               {filteredProjects.map((project, index) => (
                 <ProjectCard
                   key={project.id}

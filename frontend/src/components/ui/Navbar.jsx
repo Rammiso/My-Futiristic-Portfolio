@@ -1,48 +1,76 @@
-import { useState, useEffect } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-scroll";
 import { IoMenu, IoClose, IoSunny, IoMoon } from "react-icons/io5";
 import { NAV_LINKS } from "@utils/constants.js";
+
+// Throttle utility for scroll performance
+const throttle = (func, delay) => {
+  let timeoutId;
+  let lastRan;
+  return function (...args) {
+    if (!lastRan) {
+      func.apply(this, args);
+      lastRan = Date.now();
+    } else {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        if (Date.now() - lastRan >= delay) {
+          func.apply(this, args);
+          lastRan = Date.now();
+        }
+      }, delay - (Date.now() - lastRan));
+    }
+  };
+};
 
 const Navbar = ({ theme, toggleTheme }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
-  const { scrollY } = useScroll();
+  const [isScrolling, setIsScrolling] = useState(false);
 
-  // Transform values based on scroll
-  const navHeight = useTransform(scrollY, [0, 100], [80, 64]);
-  const logoScale = useTransform(scrollY, [0, 100], [1, 0.9]);
-  const blurAmount = useTransform(scrollY, [0, 50], [0, 20]);
-
+  // Optimized scroll handler with throttling
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = throttle(() => {
       setIsScrolled(window.scrollY > 20);
+    }, 100); // Throttle to 100ms
+
+    // Detect scroll start/end for performance
+    let scrollTimeout;
+    const handleScrollStart = () => {
+      setIsScrolling(true);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 150);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScrollStart, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleScrollStart);
+      clearTimeout(scrollTimeout);
+    };
   }, []);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
     <>
-      {/* Main Navbar */}
+      {/* Main Navbar - Optimized */}
       <motion.nav
-        style={{ height: navHeight }}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? "glass-dark backdrop-blur-xl border-b border-neon-green/30 shadow-lg shadow-neon-green/10"
-            : "bg-transparent backdrop-blur-sm"
+            ? "glass-dark backdrop-blur-xl border-b border-neon-green/30 shadow-lg shadow-neon-green/10 h-16"
+            : "bg-transparent backdrop-blur-sm h-20"
         }`}
+        style={{ willChange: isScrolling ? "transform, opacity" : "auto" }}
       >
         {/* Neon Top Edge */}
         {isScrolled && (
@@ -71,13 +99,13 @@ const Navbar = ({ theme, toggleTheme }) => {
             <Link
               to="hero"
               smooth={true}
-              duration={500}
+              duration={300}
               className="cursor-pointer"
             >
               <motion.div
-                style={{ scale: logoScale }}
                 whileHover={{ scale: 1.05 }}
                 className="relative group"
+                style={{ willChange: "transform" }}
               >
                 {/* Logo Glow */}
                 <motion.div
@@ -125,9 +153,10 @@ const Navbar = ({ theme, toggleTheme }) => {
                   key={link.id}
                   to={link.id}
                   smooth={true}
-                  duration={500}
+                  duration={300}
                   spy={true}
                   offset={-80}
+                  hashSpy={false}
                   onSetActive={() => setActiveSection(link.id)}
                   className="relative group cursor-pointer"
                 >
@@ -326,9 +355,10 @@ const Navbar = ({ theme, toggleTheme }) => {
                       <Link
                         to={link.id}
                         smooth={true}
-                        duration={500}
+                        duration={300}
                         spy={true}
                         offset={-80}
+                        hashSpy={false}
                         onClick={closeMobileMenu}
                         className="block group cursor-pointer"
                       >

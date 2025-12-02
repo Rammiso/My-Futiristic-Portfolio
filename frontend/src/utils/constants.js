@@ -1,3 +1,8 @@
+// ==================== RESUME/CV ====================
+import ResumePDF from "../assets/RESUME.pdf";
+
+export const RESUME_URL = ResumePDF;
+
 // API Base URL
 export const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -116,9 +121,6 @@ export const SOCIAL_LINKS = [
   { name: "Twitter", url: "https://twitter.com/yourusername", icon: "twitter" },
   { name: "Email", url: "mailto:your.email@example.com", icon: "email" },
 ];
-
-// Resume Download Link
-export const RESUME_URL = "/resume.pdf";
 
 // Contact Info
 export const CONTACT_INFO = {

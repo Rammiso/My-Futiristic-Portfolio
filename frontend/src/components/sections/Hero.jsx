@@ -481,6 +481,28 @@ const Hero = () => {
   // In-memory canvas persistence
   const canvasRef = useRef(null);
   const sceneLoadedRef = useRef(false);
+  const sectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  // Use Intersection Observer to detect visibility
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 } // Trigger when 10% visible
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -496,19 +518,45 @@ const Hero = () => {
     return () => clearTimeout(qualityTimer);
   }, []);
 
-  // Typing animation
+  // Typing animation - CONTINUOUS LOOP
   useEffect(() => {
+    const fullText = "Full Stack Developer | AI Engineer | UI/UX Designer";
     let index = 0;
-    const typingInterval = setInterval(() => {
-      if (index < fullText.length) {
-        setText(fullText.substring(0, index + 1));
-        index++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 50);
+    let isDeleting = false;
+    let loopTimeout;
 
-    return () => clearInterval(typingInterval);
+    const type = () => {
+      if (!isDeleting) {
+        // Typing forward
+        if (index < fullText.length) {
+          setText(fullText.substring(0, index + 1));
+          index++;
+          loopTimeout = setTimeout(type, 50); // Typing speed
+        } else {
+          // Finished typing, pause before deleting
+          loopTimeout = setTimeout(() => {
+            isDeleting = true;
+            type();
+          }, 3000); // Pause for 3 seconds at end
+        }
+      } else {
+        // Deleting backward
+        if (index > 0) {
+          setText(fullText.substring(0, index - 1));
+          index--;
+          loopTimeout = setTimeout(type, 30); // Faster deletion speed
+        } else {
+          // Finished deleting, pause before typing again
+          isDeleting = false;
+          loopTimeout = setTimeout(type, 1000); // Pause for 1 second before restart
+        }
+      }
+    };
+
+    // Start the typing loop
+    loopTimeout = setTimeout(type, 500); // Initial delay
+
+    return () => clearTimeout(loopTimeout);
   }, []);
 
   // Cursor blink
@@ -550,6 +598,7 @@ const Hero = () => {
 
   return (
     <section
+      ref={sectionRef}
       id="hero"
       className="relative min-h-[90vh] pt-28 flex items-center justify-center overflow-hidden bg-cyber-darker"
       onMouseMove={handleMouseMove}
@@ -707,7 +756,7 @@ const Hero = () => {
 
             {/* Tech Stack Indicators */}
             <motion.div variants={itemVariants} className="flex gap-4 pt-4">
-              {["React", "Node.js", "AI", "Three.js"].map((tech, i) => (
+              {["React", "Node.js", "AI", "Express.js"].map((tech, i) => (
                 <div
                   key={tech}
                   className="px-4 py-2 glass-dark border border-neon-green/30 rounded text-xs font-mono"
@@ -719,7 +768,7 @@ const Hero = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right 3D Scene - OPTIMIZED WITH IN-MEMORY PERSISTENCE */}
+          {/* Right 3D Scene - WITH FALLBACK IMAGE */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -727,7 +776,19 @@ const Hero = () => {
             className="relative h-[400px] lg:h-[500px] hidden md:block"
           >
             <div className="relative w-full h-full rounded-lg overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-radial from-neon-green/20 via-neon-cyan/10 to-transparent blur-3xl" />
+              {/* Background Placeholder Image - Shows if Canvas fails */}
+              <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
+                style={{
+                  backgroundImage: 'url("/hero-placeholder.png")',
+                  filter: "brightness(0.8) saturate(1.3)",
+                }}
+              >
+                {/* Fallback gradient if no image */}
+                <div className="absolute inset-0 bg-gradient-to-br from-cyber-darker via-neon-green/10 to-neon-cyan/20" />
+              </div>
+
+              <div className="absolute inset-0 bg-gradient-radial from-neon-green/20 via-neon-cyan/10 to-transparent blur-3xl z-1" />
 
               {/* Loading Placeholder - Shows until canvas is ready */}
               {!isFullQuality && (
@@ -777,19 +838,29 @@ const Hero = () => {
                 </motion.div>
               )}
 
-              {/* 3D Canvas - LOADS ONCE, PERSISTS IN MEMORY */}
+              {/* 3D Canvas - Transparent when not visible */}
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={{ opacity: isFullQuality ? 1 : 0 }}
+                animate={{
+                  opacity: isFullQuality && isVisible ? 1 : 0,
+                }}
                 transition={{ duration: 0.5 }}
-                className="absolute inset-0"
+                className="absolute inset-0 z-10"
+                style={{
+                  pointerEvents: isFullQuality && isVisible ? "auto" : "none",
+                }}
               >
                 <Canvas
                   ref={canvasRef}
                   camera={{ position: [0, 0, 6], fov: 50 }}
-                  dpr={devicePerf.scale} // Adaptive resolution
-                  frameloop="demand" // Only render when needed
-                  performance={{ min: 0.5 }} // Throttle on slow devices
+                  dpr={Math.min(window.devicePixelRatio, 2)}
+                  frameloop={isVisible ? "always" : "never"}
+                  performance={{ min: 0.5 }}
+                  gl={{
+                    preserveDrawingBuffer: true,
+                    antialias: devicePerf.tier !== "low",
+                    powerPreference: "high-performance",
+                  }}
                 >
                   <Suspense fallback={null}>
                     <TechHologramScene
@@ -802,13 +873,13 @@ const Hero = () => {
               </motion.div>
 
               {/* HUD Overlay */}
-              <div className="absolute top-4 right-4 p-3 glass-dark border border-neon-cyan/30 rounded backdrop-blur-sm">
+              {/* <div className="absolute top-4 right-4 p-3 glass-dark border border-neon-cyan/30 rounded backdrop-blur-sm">
                 <div className="text-xs font-mono text-neon-cyan space-y-1">
                   <div>STATUS: ACTIVE</div>
                   <div>RENDER: WEBGL</div>
                   <div>SYS: HOLOGRAM_V2</div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Scan Lines Effect */}
               <div className="absolute inset-0 pointer-events-none opacity-10">

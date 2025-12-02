@@ -16,7 +16,8 @@ import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/projects.js";
 // import blogRoutes from "./routes/blog.js";
 import contactRoutes from "./routes/contact.js";
-import aiRoutes from "./routes/ai.js";
+// import aiRoutes from "./routes/ai.js";
+// import aiPlaygroundRoutes from "./routes/aiPlayground.routes.js";
 
 // Load environment variables
 dotenv.config();
@@ -75,7 +76,8 @@ app.use("/api/admin", authRoutes);
 app.use("/api/projects", projectRoutes);
 // app.use("/api/posts", blogRoutes);
 app.use("/api/contact", contactRoutes);
-app.use("/api/ai", aiRoutes);
+// app.use("/api/ai", aiRoutes);
+// app.use("/api/ai-playground", aiPlaygroundRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -99,6 +101,7 @@ app.get("/", (req, res) => {
       projects: "/api/projects",
       contact: "/api/contact",
       ai: "/api/ai",
+      aiPlayground: "/api/ai-playground",
     },
   });
 });
