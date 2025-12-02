@@ -2,46 +2,76 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- SEO Meta Tags -->
+    <!-- Favicon - Multiple Formats for All Devices -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Theme Color for Mobile Browsers -->
+    <meta name="theme-color" content="#0a0a0f" />
+    <meta name="msapplication-TileColor" content="#0a0a0f" />
+
+    <!-- Primary Meta Tags (SEO) -->
+    <title>Musab - Full Stack Developer | MERN Stack & AI Solutions</title>
+    <meta
+      name="title"
+      content="Musab - Full Stack Developer | MERN Stack & AI Solutions"
+    />
     <meta
       name="description"
-      content="Musab - Full Stack Developer specializing in MERN Stack, UI/UX Design, and AI Solutions. Explore my portfolio of innovative web applications."
+      content="Futuristic portfolio of Musab, a Full Stack Developer specializing in MERN Stack, React, Node.js, MongoDB, AI Integration, and cutting-edge web development. Explore innovative projects and solutions."
     />
     <meta
       name="keywords"
-      content="MERN Stack Developer, React Developer, Node.js, MongoDB, Full Stack, UI/UX Design, AI Solutions, Web Development"
+      content="Musab, Full Stack Developer, MERN Stack, React Developer, Node.js, MongoDB, Express.js, JavaScript, AI Solutions, Web Development, Portfolio, UI/UX Design, Three.js, Framer Motion"
     />
     <meta name="author" content="Musab" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
 
-    <!-- Open Graph Meta Tags -->
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://yourwebsite.com" />
+
+    <!-- Open Graph / Facebook Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yourwebsite.com" />
     <meta
       property="og:title"
-      content="Musab - Full Stack Developer Portfolio"
+      content="Musab - Full Stack Developer | MERN Stack & AI Solutions"
     />
     <meta
       property="og:description"
-      content="Futuristic portfolio showcasing MERN stack projects, AI solutions, and innovative web development."
+      content="Futuristic portfolio showcasing MERN stack projects, AI solutions, and innovative web development with cyberpunk aesthetics."
     />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://yourwebsite.com" />
-    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image" content="https://yourwebsite.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Musab Portfolio" />
+    <meta property="og:locale" content="en_US" />
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://yourwebsite.com" />
     <meta
       name="twitter:title"
-      content="Musab - Full Stack Developer Portfolio"
+      content="Musab - Full Stack Developer | MERN Stack & AI Solutions"
     />
     <meta
       name="twitter:description"
       content="Futuristic portfolio showcasing MERN stack projects, AI solutions, and innovative web development."
     />
-    <meta name="twitter:image" content="/twitter-image.jpg" />
+    <meta
+      name="twitter:image"
+      content="https://yourwebsite.com/twitter-image.jpg"
+    />
+    <meta name="twitter:creator" content="@yourtwitter" />
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts - Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -49,9 +79,23 @@
       rel="stylesheet"
     />
 
-    <title>Musab - Full Stack Developer | MERN Stack & AI Solutions</title>
+    <!-- DNS Prefetch for External Resources -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+
+    <!-- Preload Critical Assets -->
+    <link rel="preload" href="/src/main.jsx" as="script" />
   </head>
   <body>
+    <noscript>
+      <div style="padding: 2rem; text-align: center; font-family: sans-serif">
+        <h1>⚠️ JavaScript Required</h1>
+        <p>
+          This portfolio requires JavaScript to run. Please enable JavaScript in
+          your browser settings to view the content.
+        </p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
