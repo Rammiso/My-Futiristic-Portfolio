@@ -126,7 +126,7 @@ const HolographicPortrait = ({ mouseX, mouseY }) => {
   const [flicker, setFlicker] = useState(1);
 
   // Load actual portrait texture
-  const texture = useLoader(THREE.TextureLoader, "/src/assets/MUSAB.png");
+  const texture = useLoader(THREE.TextureLoader, "/MUSAB.png");
 
   useFrame((state) => {
     if (meshRef.current) {
@@ -530,7 +530,7 @@ const About = () => {
                   <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
                     style={{
-                      backgroundImage: 'url("/src/assets/MUSAB.png")',
+                      backgroundImage: 'url("/MUSAB.png")',
                       filter: "brightness(0.8)",
                     }}
                   >

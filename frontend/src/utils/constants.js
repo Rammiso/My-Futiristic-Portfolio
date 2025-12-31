@@ -1,7 +1,5 @@
 // ==================== RESUME/CV ====================
-import ResumePDF from "../assets/RESUME.pdf";
-
-export const RESUME_URL = ResumePDF;
+export const RESUME_URL = "/RESUME.pdf";
 
 // API Base URL
 export const API_URL =
