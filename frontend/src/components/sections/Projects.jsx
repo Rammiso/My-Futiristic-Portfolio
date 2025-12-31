@@ -18,13 +18,13 @@ const projectsData = [
     technologies: ["React", "Node.js", "MongoDB", "TailwindCSS", "Express"],
     category: "Web",
     liveUrl: "https://murti-guutoo-student-association-v1.vercel.app/",
-    githubUrl: "#",
+    githubUrl: "https://github.com/Rammiso/Murti-Guutoo-Student-Association",
     featured: true,
     color: "#39FF14",
   },
   {
     id: 2,
-    title: "WealthLog Analytics",
+    title: "WealthLog",
     subtitle: "AI-Powered Financial Intelligence Platform",
     description:
       "Next-generation personal finance management system with quantum-level analytics. Real-time expense tracking, predictive savings insights, portfolio analytics, and autonomous budget optimization. Engineered with MERN stack and powered by intelligent data visualization algorithms.",
@@ -32,29 +32,15 @@ const projectsData = [
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
     technologies: ["React", "Node.js", "MongoDB", "Express", "Chart.js", "AI"],
     category: "MERN",
-    liveUrl: "#",
-    githubUrl: "#",
+    liveUrl: "https://wealth-log.vercel.app/",
+    githubUrl: "https://github.com/Rammiso/WealthLog",
     featured: true,
     color: "#00FFFF",
   },
-  {
-    id: 3,
-    title: "Islamic Knowledge Matrix",
-    subtitle: "Interactive Learning System",
-    description:
-      "Advanced knowledge-testing platform with intelligent categorization, adaptive scoring algorithms, and ultra-responsive UX. Features multi-tier difficulty progression, instant feedback systems, and gamified learning pathways designed for optimal knowledge retention.",
-    image:
-      "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80",
-    technologies: ["React", "JavaScript", "Firebase", "TailwindCSS"],
-    category: "Web",
-    liveUrl: "#",
-    githubUrl: "https://github.com/Rammiso/Ramiso-Islamic-Quiz",
-    featured: false,
-    color: "#FF10F0",
-  },
+  
   {
     id: 4,
-    title: "Izharul Haq Automation Core",
+    title: "Izharul Haq Telegram Bot",
     subtitle: "Intelligent Task Orchestration Bot",
     description:
       "Autonomous automation engine designed for workflow optimization and intelligent auto-response systems. Handles complex task sequences, smart scheduling, and adaptive decision-making protocols. Built with advanced scripting and API integration architecture.",
@@ -67,21 +53,7 @@ const projectsData = [
     featured: false,
     color: "#FFA500",
   },
-  {
-    id: 5,
-    title: "Per Diem Command Center",
-    subtitle: "Enterprise Financial Management System",
-    description:
-      "Sophisticated web-based platform for organizational per-diem workflows. Features request submission portals, multi-tier approval systems, real-time tracking dashboards, and comprehensive financial reporting. Engineered for scalability and security compliance.",
-    image:
-      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
-    technologies: ["PHP", "MySQL", "JavaScript", "Bootstrap"],
-    category: "Web",
-    liveUrl: "#",
-    githubUrl: "#",
-    featured: false,
-    color: "#39FF14",
-  },
+
   {
     id: 6,
     title: "NeuralDoc AI Assistant",

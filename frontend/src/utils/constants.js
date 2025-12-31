@@ -5,7 +5,7 @@ export const RESUME_URL = ResumePDF;
 
 // API Base URL
 export const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  import.meta.env.VITE_API_URL || "http://localhost:10000/api";
 
 // Navigation Links
 export const NAV_LINKS = [

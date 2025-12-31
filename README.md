@@ -36,7 +36,7 @@
 4. **Projects** - Filterable portfolio showcase
 5. **AI Playground** - Interactive AI demonstrations
 6. **Contact** - 3D globe with contact form
-7. **Admin Panel** - Project & content management
+7. **Admin Panel** - Project & contact management
 
 ---
 

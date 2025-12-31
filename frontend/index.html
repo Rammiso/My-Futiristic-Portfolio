@@ -1,8 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Favicon - Multiple Formats for All Devices -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -27,12 +28,17 @@
     />
     <meta
       name="keywords"
-      content="Musab, Full Stack Developer, MERN Stack, React Developer, Node.js, MongoDB, Express.js, JavaScript, AI Solutions, Web Development, Portfolio, UI/UX Design, Three.js, Framer Motion"
+      content="Musab, Full Stack Developer, MERN Stack, React Developer, Node.js, MongoDB, Express.js, JavaScript, AI Solutions, Web Development, Portfolio, UI/UX Design, Three.js, Framer Motion, Software Engineer, Frontend Developer, Backend Developer"
     />
     <meta name="author" content="Musab" />
-    <meta name="robots" content="index, follow" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
     <meta name="language" content="English" />
     <meta name="revisit-after" content="7 days" />
+    <meta name="rating" content="general" />
+    <meta name="distribution" content="global" />
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://yourwebsite.com" />
@@ -51,6 +57,10 @@
     <meta property="og:image" content="https://yourwebsite.com/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Musab Portfolio - Full Stack Developer"
+    />
     <meta property="og:site_name" content="Musab Portfolio" />
     <meta property="og:locale" content="en_US" />
 
@@ -69,7 +79,78 @@
       name="twitter:image"
       content="https://yourwebsite.com/twitter-image.jpg"
     />
+    <meta
+      name="twitter:image:alt"
+      content="Musab Portfolio - Full Stack Developer"
+    />
     <meta name="twitter:creator" content="@yourtwitter" />
+    <meta name="twitter:site" content="@yourtwitter" />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="Your-Region" />
+    <meta name="geo.placename" content="Your-City" />
+    <meta name="geo.position" content="latitude;longitude" />
+    <meta name="ICBM" content="latitude, longitude" />
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Musab",
+        "jobTitle": "Full Stack Developer",
+        "description": "Full Stack Developer specializing in MERN Stack, React, Node.js, MongoDB, AI Integration, and cutting-edge web development",
+        "url": "https://yourwebsite.com",
+        "image": "https://yourwebsite.com/profile-image.jpg",
+        "sameAs": [
+          "https://github.com/yourusername",
+          "https://linkedin.com/in/yourusername",
+          "https://twitter.com/yourusername"
+        ],
+        "knowsAbout": [
+          "JavaScript",
+          "React",
+          "Node.js",
+          "MongoDB",
+          "Express.js",
+          "MERN Stack",
+          "AI Integration",
+          "Web Development",
+          "Three.js",
+          "Framer Motion"
+        ],
+        "alumniOf": {
+          "@type": "Organization",
+          "name": "Your University/School"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Your City",
+          "addressRegion": "Your Region",
+          "addressCountry": "Your Country"
+        }
+      }
+    </script>
+
+    <!-- Website Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Musab Portfolio",
+        "url": "https://yourwebsite.com",
+        "description": "Futuristic portfolio showcasing MERN stack projects, AI solutions, and innovative web development",
+        "author": {
+          "@type": "Person",
+          "name": "Musab"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://yourwebsite.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
 
     <!-- Google Fonts - Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -85,6 +166,19 @@
 
     <!-- Preload Critical Assets -->
     <link rel="preload" href="/src/main.jsx" as="script" />
+
+    <!-- Security Headers -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:;"
+    />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta
+      http-equiv="Referrer-Policy"
+      content="strict-origin-when-cross-origin"
+    />
   </head>
   <body>
     <noscript>
