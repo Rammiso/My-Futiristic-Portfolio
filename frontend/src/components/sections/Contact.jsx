@@ -16,6 +16,7 @@ import Card from "@components/ui/Card.jsx";
 import Button from "@components/ui/Button.jsx";
 import { FADE_IN_UP, STAGGER_CONTAINER } from "@utils/constants.js";
 import toast from "react-hot-toast";
+import api from "@utils/api.js";
 import * as THREE from "three";
 
 // 3D Holographic Globe
@@ -210,22 +211,12 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        toast.success("Message sent successfully!");
-        setFormData({ name: "", email: "", subject: "", message: "" });
-      } else {
-        toast.error("Failed to send message. Please try again.");
-      }
+      const response = await api.post("/contact", formData);
+      
+      toast.success("Message sent successfully!");
+      setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      toast.error("An error occurred. Please try again later.");
+      toast.error("Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
