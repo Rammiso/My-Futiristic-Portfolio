@@ -44,7 +44,7 @@ const detectDevicePerformance = () => {
 
 const devicePerf = detectDevicePerformance();
 
-// ==================== OPTIMIZED 3D COMPONENTS ====================
+// ==================== OPTIMIZED 3D COMPONENTs====================
 
 // Memoized Orbiting Logo (reduced calculations)
 const OrbitingLogo = memo(
@@ -738,7 +738,7 @@ const Hero = () => {
                 </motion.div>
               </Link>
 
-              <a href={RESUME_URL} download>
+              <a href={RESUME_URL} download="Musab_Resume.pdf">
                 <motion.div
                   whileHover={{ scale: 1.05, rotateY: 5 }}
                   whileTap={{ scale: 0.95 }}
