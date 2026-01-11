@@ -6,6 +6,7 @@ import { IoDownload, IoMail, IoArrowForward } from "react-icons/io5";
 import { Link } from "react-scroll";
 import Button from "@components/ui/Button.jsx";
 import { RESUME_URL } from "@utils/constants.js";
+import { downloadResume } from "@utils/downloadHelper.js";
 import * as THREE from "three";
 
 // ==================== PERFORMANCE UTILITIES ====================
@@ -738,7 +739,16 @@ const Hero = () => {
                 </motion.div>
               </Link>
 
-              <a href={RESUME_URL} download="Musab_Resume.pdf">
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  playClick();
+                  const success = await downloadResume();
+                  if (!success) {
+                    alert('Download failed. Please try again or contact support.');
+                  }
+                }}
+              >
                 <motion.div
                   whileHover={{ scale: 1.05, rotateY: 5 }}
                   whileTap={{ scale: 0.95 }}
@@ -751,7 +761,7 @@ const Hero = () => {
                     Download CV
                   </Button>
                 </motion.div>
-              </a>
+              </button>
             </motion.div>
 
             {/* Tech Stack Indicators */}
