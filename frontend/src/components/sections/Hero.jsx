@@ -126,18 +126,23 @@ const Hero = () => {
 
             {/* Name */}
             <motion.div variants={itemVariants}>
-              <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold mb-4 relative">
+              <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold mb-4 relative font-display">
                 <span className="text-gradient relative z-10">Musab</span>
                 {/* Glitch — CSS animation, no JS */}
                 <span
-                  className="absolute top-0 left-0 text-neon-cyan opacity-20 blur-sm pointer-events-none"
-                  style={{ animation: "glitch 4s step-end infinite" }}
+                  className="absolute top-0 left-0 opacity-10 blur-sm pointer-events-none font-display"
+                  style={{
+                    animation: "glitch 4s step-end infinite",
+                    background: "linear-gradient(135deg, #ffffff 0%, #94a3b8 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
                   aria-hidden="true"
                 >
                   Musab
                 </span>
               </h1>
-              <div className="h-1 w-32 bg-gradient-to-r from-neon-green via-neon-cyan to-transparent" />
+              <div className="h-px w-32 bg-gradient-to-r from-white/40 via-slate-400/60 to-transparent" />
             </motion.div>
 
             {/* Typing Subtitle */}

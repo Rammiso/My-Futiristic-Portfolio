@@ -130,10 +130,10 @@ const Navbar = ({ theme, toggleTheme }) => {
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}
-                    className="text-2xl md:text-3xl font-bold"
+                    className="text-2xl md:text-3xl font-bold font-display"
                   >
                     <span className="text-gradient">Musab</span>
-                    <span className="text-neon-green">.</span>
+                    <span className="text-white/40">.</span>
                   </motion.div>
 
                   {/* Status Indicator */}

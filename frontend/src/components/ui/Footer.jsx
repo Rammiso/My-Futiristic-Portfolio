@@ -125,7 +125,7 @@ const Footer = () => {
             <div className="flex items-start gap-4">
               <PulsingOrb />
               <div>
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-neon-cyan to-neon-green bg-clip-text text-transparent mb-2">
+                <h3 className="text-2xl font-bold font-display text-gradient mb-2">
                   Musab
                 </h3>
                 <p className="text-sm text-white/60 leading-relaxed">
@@ -221,7 +221,7 @@ const Footer = () => {
               <div className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
               <p className="text-sm text-white/60">
                 © {currentYear}{" "}
-                <span className="text-neon-cyan font-semibold">Musab</span> —
+                <span className="font-semibold text-gradient font-display">Musab</span> —
                 All Rights Reserved.
               </p>
             </div>

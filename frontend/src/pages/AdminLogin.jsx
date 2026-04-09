@@ -68,7 +68,7 @@ const AdminLogin = () => {
           <Card variant="glass" className="p-8">
             {/* Header */}
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gradient mb-2">
+              <h1 className="text-3xl font-bold font-display text-gradient mb-2">
                 Admin Portal
               </h1>
               <p className="text-white/60 text-sm">

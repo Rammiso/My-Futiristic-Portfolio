@@ -376,7 +376,7 @@ const Contact = () => {
 
           {/* Tagline */}
           <motion.div variants={FADE_IN_UP} className="text-center mt-12 sm:mt-16">
-            <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink bg-clip-text text-transparent">
+            <p className="text-xl sm:text-2xl font-bold font-display text-gradient">
               Let's build something extraordinary.
             </p>
           </motion.div>

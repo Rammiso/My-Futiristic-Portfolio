@@ -46,7 +46,7 @@ const AdminDashboard = () => {
           <div className="container-custom py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gradient">
+                <h1 className="text-2xl font-bold font-display text-gradient">
                   Admin Dashboard
                 </h1>
                 <p className="text-white/60 text-sm mt-1">

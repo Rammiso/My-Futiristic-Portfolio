@@ -153,7 +153,7 @@ const About = () => {
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-1 h-8 bg-neon-green" />
                   <div>
-                    <h3 className="text-2xl font-bold text-neon-green">Hello! I'm Musab 👋</h3>
+                    <h3 className="text-2xl font-bold font-display text-gradient">Hello! I'm Musab 👋</h3>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse" />
                       <span className="text-xs font-mono text-white/50">ONLINE</span>

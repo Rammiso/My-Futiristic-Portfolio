@@ -168,9 +168,17 @@ body {
    Utility Classes
    ============================================= */
 @layer utilities {
+  /* Name / heading gradient — dark mode: crisp white → cool silver */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-neon-green via-neon-cyan to-neon-purple;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #ffffff 0%, #94a3b8 50%, #cbd5e1 100%);
   }
+
+  /* Light mode override — deep slate → indigo, professional & readable */
+  .light .text-gradient {
+    background-image: linear-gradient(135deg, #0f172a 0%, #334155 50%, #475569 100%);
+  }
+
   .section-padding {
     @apply px-4 sm:px-6 lg:px-8 py-16 md:py-24;
   }
@@ -213,7 +221,7 @@ body {
   }
 
   .section-title {
-    @apply text-4xl md:text-5xl font-bold mb-4 text-gradient;
+    @apply text-4xl md:text-5xl font-bold mb-4 text-gradient font-sans;
   }
 }
 
