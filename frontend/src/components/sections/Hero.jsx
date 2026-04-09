@@ -215,83 +215,98 @@ const Hero = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right Visual */}
+          {/* Right Visual — Portrait */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="relative h-[400px] lg:h-[500px] hidden md:block"
+            initial={{ opacity: 0, x: 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            className="relative flex items-center justify-center hidden md:flex"
           >
-            <div className="relative w-full h-full rounded-lg overflow-hidden">
-              {/* Portrait */}
+            {/* Outer rotating ring */}
+            <div
+              className="absolute w-[420px] h-[420px] rounded-full border border-neon-green/20 pointer-events-none"
+              style={{ animation: "spin 30s linear infinite" }}
+            />
+            {/* Mid rotating ring */}
+            <div
+              className="absolute w-[370px] h-[370px] rounded-full border border-neon-cyan/15 pointer-events-none"
+              style={{ animation: "spin 20s linear infinite reverse" }}
+            />
+
+            {/* HUD tick marks on outer ring */}
+            {[0, 60, 120, 180, 240, 300].map((deg) => (
               <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-                style={{
-                  backgroundImage: 'url("/hero-placeholder.png")',
-                  filter: "brightness(0.8) saturate(1.3)",
-                }}
+                key={deg}
+                className="absolute w-[420px] h-[420px] pointer-events-none"
+                style={{ transform: `rotate(${deg}deg)` }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-cyber-darker via-neon-green/10 to-neon-cyan/20" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-3 bg-neon-green/50" />
               </div>
+            ))}
 
-              {/* Ambient glow — CSS animation */}
-              <div
-                className="absolute inset-0 bg-gradient-radial from-neon-green/20 via-neon-cyan/10 to-transparent blur-3xl z-10 pointer-events-none"
-                style={{ animation: "ambientPulse 4s ease-in-out infinite" }}
-              />
-
-              {/* Floating Tech Icons — staggered CSS float */}
-              {[
-                { icon: "⚛️", color: "#00FFFF", top: "20%", left: "15%", delay: "0s" },
-                { icon: "🚀", color: "#39FF14", top: "70%", left: "20%", delay: "0.5s" },
-                { icon: "🎨", color: "#FF10F0", top: "30%", right: "15%", delay: "1s" },
-                { icon: "⚡", color: "#FFD700", top: "60%", right: "25%", delay: "1.5s" },
-              ].map((tech, i) => (
-                <div
-                  key={i}
-                  className="absolute text-4xl z-20 pointer-events-none"
-                  style={{
-                    top: tech.top,
-                    left: tech.left,
-                    right: tech.right,
-                    color: tech.color,
-                    filter: `drop-shadow(0 0 10px ${tech.color})`,
-                    animation: `iconFloat 3s ease-in-out infinite`,
-                    animationDelay: tech.delay,
-                  }}
-                >
-                  {tech.icon}
-                </div>
-              ))}
-
-              {/* Central Orb — CSS spin + pulse */}
-              <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 z-30 pointer-events-none"
-                style={{ animation: "spin 20s linear infinite" }}
-              >
-                <div className="w-full h-full rounded-full border-2 border-neon-green opacity-60" />
-                <div className="absolute inset-2 rounded-full border border-neon-cyan opacity-40" />
-                <div className="absolute inset-4 rounded-full border border-neon-pink opacity-30" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-neon-green animate-pulse" style={{ animation: "none" }}>M</span>
-                </div>
-              </div>
-
-              {/* Connecting Lines */}
-              <svg className="absolute inset-0 w-full h-full z-25 pointer-events-none">
-                <line x1="20%" y1="25%" x2="50%" y2="50%" stroke="#39FF14" strokeWidth="1"
-                  style={{ animation: "linePulse 3s ease-in-out infinite", opacity: 0.3 }} />
-                <line x1="80%" y1="35%" x2="50%" y2="50%" stroke="#FF10F0" strokeWidth="1"
-                  style={{ animation: "linePulse 3s ease-in-out infinite 1s", opacity: 0.3 }} />
-              </svg>
-
-              {/* Scan Lines */}
-              <div className="absolute inset-0 pointer-events-none opacity-10 z-40"
-                style={{
-                  backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(57, 255, 20, 0.1) 2px, rgba(57, 255, 20, 0.1) 4px)",
-                }}
-              />
+            {/* Corner HUD data labels */}
+            <div className="absolute top-4 left-4 font-mono text-[10px] text-neon-green/60 leading-tight pointer-events-none">
+              <div>SYS: ONLINE</div>
+              <div>ID: MBK-001</div>
             </div>
+            <div className="absolute top-4 right-4 font-mono text-[10px] text-neon-cyan/60 leading-tight text-right pointer-events-none">
+              <div>STACK: MERN</div>
+              <div>AI: ACTIVE</div>
+            </div>
+            <div className="absolute bottom-4 left-4 font-mono text-[10px] text-neon-pink/60 leading-tight pointer-events-none">
+              <div>MODE: DEV</div>
+              <div>STATUS: ●</div>
+            </div>
+            <div className="absolute bottom-4 right-4 font-mono text-[10px] text-neon-green/60 leading-tight text-right pointer-events-none">
+              <div>VER: 2.0</div>
+              <div>BUILD: OK</div>
+            </div>
+
+            {/* Portrait frame */}
+            <div className="relative w-72 h-80 lg:w-80 lg:h-96">
+              {/* Neon border glow layers */}
+              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-neon-green via-neon-cyan to-neon-pink opacity-60 blur-md pointer-events-none" />
+              <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-br from-neon-green via-neon-cyan to-neon-pink opacity-80 pointer-events-none" />
+
+              {/* Image container */}
+              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-cyber-darker">
+                <img
+                  src={musabImg}
+                  alt="Musab"
+                  className="w-full h-full object-cover object-top"
+                  style={{ filter: "brightness(0.95) contrast(1.05) saturate(1.1)" }}
+                />
+
+                {/* Subtle color overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-cyber-darker/60 via-transparent to-neon-cyan/5 pointer-events-none" />
+
+                {/* Scan lines */}
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-[0.06]"
+                  style={{
+                    backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(57,255,20,0.8) 3px, rgba(57,255,20,0.8) 4px)",
+                  }}
+                />
+
+                {/* Animated scan sweep */}
+                <div
+                  className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-cyan/70 to-transparent pointer-events-none"
+                  style={{ animation: "scanSweep 4s ease-in-out infinite" }}
+                />
+              </div>
+
+              {/* Corner brackets on frame */}
+              <div className="absolute -top-1 -left-1 w-5 h-5 border-l-2 border-t-2 border-neon-green rounded-tl pointer-events-none" />
+              <div className="absolute -top-1 -right-1 w-5 h-5 border-r-2 border-t-2 border-neon-cyan rounded-tr pointer-events-none" />
+              <div className="absolute -bottom-1 -left-1 w-5 h-5 border-l-2 border-b-2 border-neon-pink rounded-bl pointer-events-none" />
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 border-r-2 border-b-2 border-neon-green rounded-br pointer-events-none" />
+            </div>
+
+            {/* Ambient glow behind portrait */}
+            <div
+              className="absolute w-64 h-64 rounded-full bg-neon-green/10 blur-3xl pointer-events-none -z-10"
+              style={{ animation: "ambientPulse 4s ease-in-out infinite" }}
+            />
           </motion.div>
         </div>
       </div>
@@ -326,13 +341,11 @@ const Hero = () => {
           0%, 100% { opacity: 0.3; transform: scale(1); }
           50% { opacity: 0.6; transform: scale(1.1); }
         }
-        @keyframes iconFloat {
-          0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-          50% { transform: translateY(-10px) rotate(5deg) scale(1.1); }
-        }
-        @keyframes linePulse {
-          0%, 100% { opacity: 0.1; }
-          50% { opacity: 0.4; }
+        @keyframes scanSweep {
+          0% { top: -2px; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
         }
       `}</style>
     </section>
