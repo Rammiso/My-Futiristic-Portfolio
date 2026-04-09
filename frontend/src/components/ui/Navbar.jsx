@@ -218,12 +218,12 @@ const Navbar = ({ theme, toggleTheme }) => {
               ))}
 
               {/* Desktop Theme Toggle */}
-              {/* <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} /> */}
+              <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} />
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="lg:hidden flex items-center gap-4">
-              {/* <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} /> */}
+            <div className="lg:hidden flex items-center gap-3">
+              <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} />
 
               <motion.button
                 whileTap={{ scale: 0.9 }}
@@ -303,7 +303,7 @@ const Navbar = ({ theme, toggleTheme }) => {
                 stiffness: 300,
                 damping: 30,
               }}
-              className="fixed top-[80px] right-0 bottom-0 w-80 glass-dark border-l border-neon-green/30 shadow-2xl z-50 lg:hidden overflow-hidden"
+              className="fixed top-[80px] right-0 bottom-0 w-72 sm:w-80 glass-dark border-l border-neon-green/30 shadow-2xl z-50 lg:hidden overflow-hidden"
             >
               {/* Neon Edge */}
               <div className="absolute top-0 left-0 bottom-0 w-px bg-gradient-to-b from-neon-green via-neon-cyan to-neon-pink" />
@@ -405,7 +405,10 @@ const Navbar = ({ theme, toggleTheme }) => {
                 <div className="pt-8 mt-8 border-t border-white/10">
                   <div className="text-xs font-mono text-white/40 space-y-1">
                     <div>STATUS: ONLINE</div>
-                    <div>MODE: {theme.toUpperCase()}</div>
+                    <div className="flex items-center gap-2">
+                      <span>MODE:</span>
+                      <span className="text-neon-green uppercase">{theme}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -417,66 +420,52 @@ const Navbar = ({ theme, toggleTheme }) => {
   );
 };
 
-// Theme Toggle Button Component
-// const ThemeToggleButton = ({ theme, toggleTheme }) => {
-//   return (
-//     <motion.button
-//       onClick={toggleTheme}
-//       whileHover={{ scale: 1.05 }}
-//       whileTap={{ scale: 0.95 }}
-//       className="relative p-3 glass border border-neon-cyan/30 rounded-lg hover:border-neon-cyan/60 transition-colors group overflow-hidden"
-//       aria-label="Toggle theme"
-//     >
-//       {/* Background Glow */}
-//       <motion.div
-//         animate={{
-//           opacity: [0.3, 0.6, 0.3],
-//         }}
-//         transition={{
-//           duration: 2,
-//           repeat: Infinity,
-//           ease: "easeInOut",
-//         }}
-//         className="absolute inset-0 bg-gradient-to-br from-neon-cyan/20 to-neon-green/20 blur"
-//       />
+// Theme Toggle Button
+const ThemeToggleButton = ({ theme, toggleTheme }) => (
+  <motion.button
+    onClick={toggleTheme}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="relative p-2.5 glass border border-neon-cyan/30 rounded-lg hover:border-neon-cyan/60 transition-colors group overflow-hidden"
+    aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+    title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+  >
+    {/* Glow */}
+    <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/10 to-neon-green/10 opacity-0 group-hover:opacity-100 transition-opacity blur" />
 
-//       {/* Icon Container */}
-//       <div className="relative w-5 h-5">
-//         <AnimatePresence mode="wait">
-//           {theme === "dark" ? (
-//             <motion.div
-//               key="moon"
-//               initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-//               animate={{ rotate: 0, opacity: 1, scale: 1 }}
-//               exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-//               transition={{ duration: 0.3 }}
-//               className="absolute inset-0"
-//             >
-//               <IoMoon className="w-5 h-5 text-neon-cyan drop-shadow-[0_0_8px_rgba(0,255,255,0.8)]" />
-//             </motion.div>
-//           ) : (
-//             <motion.div
-//               key="sun"
-//               initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
-//               animate={{ rotate: 0, opacity: 1, scale: 1 }}
-//               exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
-//               transition={{ duration: 0.3 }}
-//               className="absolute inset-0"
-//             >
-//               <IoSunny className="w-5 h-5 text-neon-yellow drop-shadow-[0_0_8px_rgba(255,255,0,0.8)]" />
-//             </motion.div>
-//           )}
-//         </AnimatePresence>
-//       </div>
-
-//       {/* Rotating Ring */}
-//       <motion.div
-//         animate={{ rotate: 360 }}
-//         transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-//         className="absolute inset-0 border border-neon-cyan/20 rounded-lg"
-//       />
-//     </motion.button>
-//   );
-// };
+    <AnimatePresence mode="wait">
+      {theme === "dark" ? (
+        <motion.div
+          key="sun"
+          initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+          exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
+          transition={{ duration: 0.25 }}
+          className="relative z-10"
+        >
+          {/* Sun icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-neon-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <circle cx="12" cy="12" r="4" />
+            <path strokeLinecap="round" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+          </svg>
+        </motion.div>
+      ) : (
+        <motion.div
+          key="moon"
+          initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
+          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+          exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
+          transition={{ duration: 0.25 }}
+          className="relative z-10"
+        >
+          {/* Moon icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-neon-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+          </svg>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </motion.button>
+);
 
 export default Navbar;

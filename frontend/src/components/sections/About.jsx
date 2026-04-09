@@ -1,336 +1,66 @@
-import { motion, useMotionValue, useTransform } from "framer-motion";
-import { useState, useEffect, useRef, Suspense } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { Sphere } from "@react-three/drei";
+import { motion } from "framer-motion";
+import { useRef } from "react";
 import Card from "@components/ui/Card.jsx";
 import { FADE_IN_UP, STAGGER_CONTAINER } from "@utils/constants.js";
-import * as THREE from "three";
 
-// Sound Effects Hook
-const useHoverSound = () => {
-  const soundRef = useRef(null);
-
-  useEffect(() => {
-    soundRef.current = new Audio(
-      "data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
-    );
-    soundRef.current.volume = 0.2;
-  }, []);
-
-  const playSound = () => {
-    if (soundRef.current) {
-      soundRef.current.currentTime = 0;
-      soundRef.current.play().catch(() => {});
-    }
-  };
-};
-
-// Animated Counter Hook
-const useAnimatedCounter = (end, duration = 2000, inView = false) => {
-  const [count, setCount] = useState(0);
-  const countRef = useRef(false);
-
-  useEffect(() => {
-    if (!inView || countRef.current) return;
-
-    countRef.current = true;
-    let startTime = null;
-    const startValue = 0;
-
-    const animate = (currentTime) => {
-      if (!startTime) startTime = currentTime;
-      const progress = Math.min((currentTime - startTime) / duration, 1);
-
-      // Easing function for smooth animation
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      const currentCount = Math.floor(
-        easeOutQuart * (end - startValue) + startValue
-      );
-
-      setCount(currentCount);
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setCount(end);
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }, [end, duration, inView]);
-
-  return count;
-};
-
-// Orbiting Particles Component
-const OrbitingParticles = () => {
-  const particlesRef = useRef([]);
-  const particleCount = 20;
-
-  const particlePositions = Array.from({ length: particleCount }, (_, i) => {
-    const angle = (i / particleCount) * Math.PI * 2;
-    const radius = 3.5 + Math.random() * 0.5;
-    return {
-      angle,
-      radius,
-      offset: Math.random() * Math.PI * 2,
-      speed: 0.3 + Math.random() * 0.3,
-    };
-  });
-
-  useFrame((state) => {
-    particlesRef.current.forEach((particle, i) => {
-      if (particle) {
-        const data = particlePositions[i];
-        const time = state.clock.elapsedTime * data.speed;
-
-        particle.position.x = Math.cos(time + data.offset) * data.radius;
-        particle.position.y = Math.sin(time * 0.7 + data.offset) * 1.2;
-        particle.position.z = Math.sin(time + data.offset) * data.radius;
-
-        // Pulsing effect
-        const pulse = 1 + Math.sin(state.clock.elapsedTime * 3 + i) * 0.3;
-        particle.scale.set(pulse, pulse, pulse);
-      }
-    });
-  });
-
-  return (
-    <group>
-      {particlePositions.map((_, i) => (
-        <mesh
-          key={`particle-${i}`}
-          ref={(el) => (particlesRef.current[i] = el)}
-        >
-          <sphereGeometry args={[0.05, 8, 8]} />
-          <meshStandardMaterial
-            color={
-              i % 3 === 0 ? "#39FF14" : i % 3 === 1 ? "#00FFFF" : "#FF10F0"
-            }
-            emissive={
-              i % 3 === 0 ? "#39FF14" : i % 3 === 1 ? "#00FFFF" : "#FF10F0"
-            }
-            emissiveIntensity={2}
-            transparent
-            opacity={0.8}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-};
-
-// Holographic Portrait Plane Component
-const HolographicPortrait = ({ mouseX, mouseY }) => {
-  const meshRef = useRef();
-  const [flicker, setFlicker] = useState(1);
-
-  // Load actual portrait texture
-  const texture = useLoader(THREE.TextureLoader, "/MUSAB.png");
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      // Smooth parallax rotation
-      meshRef.current.rotation.y = THREE.MathUtils.lerp(
-        meshRef.current.rotation.y,
-        mouseX * 0.3,
-        0.05
-      );
-      meshRef.current.rotation.x = THREE.MathUtils.lerp(
-        meshRef.current.rotation.x,
-        -mouseY * 0.2,
-        0.05
-      );
-
-      // Floating motion
-      meshRef.current.position.y =
-        Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
-
-      // Random flicker effect
-      if (Math.random() > 0.97) {
-        setFlicker(Math.random() * 0.3 + 0.7);
-      } else {
-        setFlicker(1);
-      }
-    }
-  });
-
-  return (
-    <mesh ref={meshRef}>
-      {/* Portrait plane - sized to fit container */}
-      <boxGeometry args={[3, 4, 0.1]} />
-      <meshStandardMaterial
-        map={texture}
-        transparent
-        opacity={0.98 * flicker}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
-};
-
-// Camera Controller
-const CameraController = ({ mouseX, mouseY }) => {
-  useFrame((state) => {
-    state.camera.position.x = THREE.MathUtils.lerp(
-      state.camera.position.x,
-      mouseX * 0.5,
-      0.03
-    );
-    state.camera.position.y = THREE.MathUtils.lerp(
-      state.camera.position.y,
-      mouseY * 0.5,
-      0.03
-    );
-
-    state.camera.lookAt(0, 0, 0);
-  });
-
-  return null;
-};
-
-// Main Animated Portrait Scene
-const AnimatedPortrait = ({ mouseX, mouseY }) => {
-  return (
-    <>
-      {/* Lighting Setup - neutral white light */}
-      <ambientLight intensity={0.8} color="#ffffff" />
-
-      {/* Main Lights - white for natural colors */}
-      <pointLight
-        position={[3, 3, 3]}
-        intensity={1}
-        color="#ffffff"
-        distance={10}
-      />
-      <pointLight
-        position={[-3, -3, 3]}
-        intensity={0.8}
-        color="#ffffff"
-        distance={10}
-      />
-
-      {/* Holographic Portrait */}
-      <HolographicPortrait mouseX={mouseX} mouseY={mouseY} />
-
-      {/* Orbiting Particles */}
-      <OrbitingParticles />
-
-      {/* Camera Controller */}
-      <CameraController mouseX={mouseX} mouseY={mouseY} />
-
-      {/* Soft Ambient Glow Sphere */}
-      <Sphere args={[4.5, 32, 32]}>
-        <meshBasicMaterial
-          color="#00FFFF"
-          transparent
-          opacity={0.03}
-          side={THREE.BackSide}
-        />
-      </Sphere>
-    </>
-  );
-};
-
-// Highlight Card Component
-const HighlightCard = ({ highlight, index, playSound }) => {
-  return (
-    <motion.div
-      variants={FADE_IN_UP}
-      whileHover={{ y: -5, scale: 1.02 }}
-      onHoverStart={playSound}
-      className="group cursor-pointer"
+// HighlightCard — no sound, no per-particle framer-motion infinite loops
+const HighlightCard = ({ highlight, index }) => (
+  <motion.div
+    variants={FADE_IN_UP}
+    whileHover={{ y: -5, scale: 1.02 }}
+    className="group cursor-pointer"
+  >
+    <Card
+      variant="glass"
+      className="p-6 h-full relative overflow-hidden border-neon-green/20 hover:border-neon-green/50 transition-all duration-300"
     >
-      <Card
-        variant="glass"
-        className="p-6 h-full relative overflow-hidden border-neon-green/20 hover:border-neon-green/50 transition-all duration-300"
+      {/* Corner Brackets */}
+      <div className="absolute top-2 left-2 w-4 h-4 border-l border-t border-neon-green/40" />
+      <div className="absolute top-2 right-2 w-4 h-4 border-r border-t border-neon-cyan/40" />
+      <div className="absolute bottom-2 left-2 w-4 h-4 border-l border-b border-neon-pink/40" />
+      <div className="absolute bottom-2 right-2 w-4 h-4 border-r border-b border-neon-green/40" />
+
+      {/* Hover glow */}
+      <div className="absolute inset-0 bg-gradient-radial from-neon-green/10 via-transparent to-transparent blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+      {/* Icon — CSS float, no framer-motion infinite */}
+      <div
+        className="text-6xl mb-4 relative z-10"
+        style={{
+          animation: "iconFloat 3s ease-in-out infinite",
+          animationDelay: `${index * 0.2}s`,
+        }}
       >
-        {/* Corner Brackets */}
-        <div className="absolute top-2 left-2 w-4 h-4 border-l border-t border-neon-green/40" />
-        <div className="absolute top-2 right-2 w-4 h-4 border-r border-t border-neon-cyan/40" />
-        <div className="absolute bottom-2 left-2 w-4 h-4 border-l border-b border-neon-pink/40" />
-        <div className="absolute bottom-2 right-2 w-4 h-4 border-r border-b border-neon-green/40" />
+        {highlight.icon}
+      </div>
 
-        {/* Glow Effect on Hover */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileHover={{ opacity: 1 }}
-          className="absolute inset-0 bg-gradient-radial from-neon-green/10 via-transparent to-transparent blur-xl"
-        />
+      <h4 className="text-xl font-bold text-white mb-2 relative z-10 group-hover:text-neon-green transition-colors">
+        {highlight.title}
+      </h4>
 
-        {/* Icon */}
-        <motion.div
-          animate={{ y: [-5, 5, -5] }}
-          transition={{ duration: 3, repeat: Infinity, delay: index * 0.2 }}
-          className="text-6xl mb-4 relative z-10"
-        >
-          {highlight.icon}
-        </motion.div>
+      <p className="text-white/60 text-sm leading-relaxed relative z-10">
+        {highlight.description}
+      </p>
 
-        {/* Title */}
-        <h4 className="text-xl font-bold text-white mb-2 relative z-10 group-hover:text-neon-green transition-colors">
-          {highlight.title}
-        </h4>
+      <div className="mt-4 flex items-center gap-2 relative z-10">
+        <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse" />
+        <span className="text-xs font-mono text-neon-green uppercase">Active</span>
+      </div>
 
-        {/* Description */}
-        <p className="text-white/60 text-sm leading-relaxed relative z-10">
-          {highlight.description}
-        </p>
+      {/* Scanlines */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-5"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(57, 255, 20, 0.1) 2px, rgba(57, 255, 20, 0.1) 4px)",
+        }}
+      />
+    </Card>
+  </motion.div>
+);
 
-        {/* Status Indicator */}
-        <div className="mt-4 flex items-center gap-2 relative z-10">
-          <motion.div
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-2 h-2 bg-neon-green rounded-full"
-          />
-          <span className="text-xs font-mono text-neon-green uppercase">
-            Active
-          </span>
-        </div>
-
-        {/* Scanlines */}
-        <div className="absolute inset-0 pointer-events-none opacity-5">
-          <div
-            className="w-full h-full"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(57, 255, 20, 0.1) 2px, rgba(57, 255, 20, 0.1) 4px)",
-            }}
-          />
-        </div>
-      </Card>
-    </motion.div>
-  );
-};
-
-// Main About Component
 const About = () => {
-  const playSound = useHoverSound();
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const canvasRef = useRef(null);
   const sectionRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  // Use Intersection Observer to detect visibility
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
 
   const highlights = [
     {
@@ -359,24 +89,14 @@ const About = () => {
     },
   ];
 
-  const handleMouseMove = (e) => {
-    const { clientX, clientY, currentTarget } = e;
-    const { width, height } = currentTarget.getBoundingClientRect();
-    setMousePosition({
-      x: (clientX / width - 0.5) * 2,
-      y: -(clientY / height - 0.5) * 2,
-    });
-  };
-
   return (
     <section
       ref={sectionRef}
       id="about"
       className="section-padding bg-cyber-dark relative overflow-hidden"
-      onMouseMove={handleMouseMove}
     >
-      {/* Animated Background Grid */}
-      <div className="absolute inset-0 opacity-10">
+      {/* Background Grid — static, no JS */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div
           className="absolute inset-0"
           style={{
@@ -389,13 +109,13 @@ const About = () => {
         />
       </div>
 
-      {/* Floating Gradient Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-neon-green/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-neon-cyan/10 rounded-full blur-3xl" />
+      {/* Ambient Orbs — CSS only, no JS */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-neon-green/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-neon-cyan/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* HUD Corner Elements */}
-      <div className="absolute top-8 left-8 w-16 h-16 border-l-2 border-t-2 border-neon-green/30" />
-      <div className="absolute top-8 right-8 w-16 h-16 border-r-2 border-t-2 border-neon-cyan/30" />
+      {/* HUD Corners */}
+      <div className="absolute top-8 left-8 w-16 h-16 border-l-2 border-t-2 border-neon-green/30 pointer-events-none" />
+      <div className="absolute top-8 right-8 w-16 h-16 border-r-2 border-t-2 border-neon-cyan/30 pointer-events-none" />
 
       <div className="container-custom relative z-10">
         <motion.div
@@ -406,10 +126,7 @@ const About = () => {
         >
           {/* Section Header */}
           <div className="text-center mb-16">
-            <motion.div
-              variants={FADE_IN_UP}
-              className="flex items-center justify-center gap-3 mb-4"
-            >
+            <motion.div variants={FADE_IN_UP} className="flex items-center justify-center gap-3 mb-4">
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-neon-green" />
               <span className="text-sm font-mono text-neon-green uppercase tracking-wider">
                 Profile Overview
@@ -421,175 +138,142 @@ const About = () => {
               About Me
             </motion.h2>
 
-            <motion.p
-              variants={FADE_IN_UP}
-              className="text-white/60 max-w-2xl mx-auto leading-relaxed"
-            >
-              Passionate developer crafting digital experiences that make a
-              difference
+            <motion.p variants={FADE_IN_UP} className="text-white/60 max-w-2xl mx-auto leading-relaxed">
+              Passionate developer crafting digital experiences that make a difference
             </motion.p>
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center mb-16 sm:mb-20">
             {/* Bio Card */}
             <motion.div variants={FADE_IN_UP}>
               <Card variant="glass" className="p-8 relative overflow-hidden">
-                {/* Neon Top Edge */}
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-green to-transparent" />
 
-                {/* HUD Header */}
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-1 h-8 bg-neon-green" />
                   <div>
-                    <h3 className="text-2xl font-bold text-neon-green">
-                      Hello! I'm Musab 👋
-                    </h3>
+                    <h3 className="text-2xl font-bold text-neon-green">Hello! I'm Musab 👋</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <motion.div
-                        animate={{ opacity: [0.5, 1, 0.5] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="w-2 h-2 bg-neon-green rounded-full"
-                      />
-                      <span className="text-xs font-mono text-white/50">
-                        ONLINE
-                      </span>
+                      <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse" />
+                      <span className="text-xs font-mono text-white/50">ONLINE</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Bio Content */}
                 <div className="space-y-4 text-white/70 leading-relaxed">
                   <p>
                     I'm a{" "}
-                    <span className="text-neon-green font-semibold">
-                      Full Stack Developer
-                    </span>{" "}
-                    with a passion for creating innovative web applications that
-                    solve real-world problems. My journey in software
-                    development started with a curiosity about how things work,
-                    and it has evolved into a career focused on building
+                    <span className="text-neon-green font-semibold">Full Stack Developer</span>{" "}
+                    with a passion for creating innovative web applications that solve real-world
+                    problems. My journey in software development started with a curiosity about
+                    how things work, and it has evolved into a career focused on building
                     scalable, user-friendly solutions.
                   </p>
                   <p>
                     I specialize in the{" "}
-                    <span className="text-neon-cyan font-semibold">
-                      MERN stack
-                    </span>{" "}
-                    and love working on challenging projects that push the
-                    boundaries of web development. Whether it's implementing AI
-                    features, designing intuitive interfaces, or optimizing
-                    performance, I'm always eager to learn and grow.
+                    <span className="text-neon-cyan font-semibold">MERN stack</span>{" "}
+                    and love working on challenging projects that push the boundaries of web
+                    development. Whether it's implementing AI features, designing intuitive
+                    interfaces, or optimizing performance, I'm always eager to learn and grow.
                   </p>
                   <p>
-                    When I'm not coding, you'll find me exploring new
-                    technologies, contributing to open-source projects, or
-                    sharing knowledge with the developer community.
+                    When I'm not coding, you'll find me exploring new technologies, contributing
+                    to open-source projects, or sharing knowledge with the developer community.
                   </p>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-white/10">
+                <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-8 pt-6 border-t border-white/10">
                   {[
                     { label: "Projects", value: "10+" },
                     { label: "Experience", value: "3+ Yrs" },
                     { label: "Technologies", value: "20+" },
                   ].map((stat, i) => (
                     <div key={i} className="text-center">
-                      <div className="text-2xl font-bold text-neon-green mb-1">
-                        {stat.value}
-                      </div>
-                      <div className="text-xs text-white/50 uppercase tracking-wider">
-                        {stat.label}
-                      </div>
+                      <div className="text-2xl font-bold text-neon-green mb-1">{stat.value}</div>
+                      <div className="text-xs text-white/50 uppercase tracking-wider">{stat.label}</div>
                     </div>
                   ))}
                 </div>
               </Card>
             </motion.div>
 
-            {/* 3D Holographic Portrait */}
-            <motion.div
-              variants={FADE_IN_UP}
-              className="relative h-[400px] lg:h-[500px]"
-            >
-              <Card
-                variant="glass"
-                className="h-full p-4 relative overflow-hidden"
-              >
-                {/* HUD Label */}
-                {/* <div className="absolute top-4 left-4 z-10 px-3 py-1 glass-dark border border-neon-cyan/30 rounded backdrop-blur-sm">
-                  <span className="text-xs font-mono text-neon-cyan">
-                    HOLOGRAM_V2 • PORTRAIT_ACTIVE
-                  </span>
-                </div> */}
-
-                {/* 3D Canvas */}
+            {/* Portrait Display */}
+            <motion.div variants={FADE_IN_UP} className="relative h-72 sm:h-[400px] lg:h-[500px]">
+              <Card variant="glass" className="h-full p-4 relative overflow-hidden">
                 <div className="relative w-full h-full rounded-lg overflow-hidden">
-                  {/* Background Placeholder - Your portrait image */}
+                  {/* Portrait */}
                   <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
                     style={{
                       backgroundImage: 'url("/MUSAB.png")',
-                      filter: "brightness(0.8)",
+                      filter: "brightness(0.9) contrast(1.1)",
                     }}
                   >
-                    {/* Fallback in case image doesn't load */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-neon-green/20 via-cyber-dark to-neon-cyan/20" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-neon-green/10 via-cyber-dark to-neon-cyan/10" />
                   </div>
 
-                  {/* Background Glow - Above placeholder but below Canvas */}
-                  <div className="absolute inset-0 bg-gradient-radial from-neon-green/10 via-neon-cyan/5 to-transparent blur-2xl z-1" />
-
-                  {/* 3D Canvas - Above placeholder */}
+                  {/* Ambient glow — CSS */}
                   <div
-                    className="absolute inset-0 z-10"
-                    style={{
-                      opacity: isVisible ? 1 : 0,
-                      transition: "opacity 0.5s ease-in-out",
-                      pointerEvents: isVisible ? "auto" : "none",
-                    }}
-                  >
-                    <Canvas
-                      ref={canvasRef}
-                      camera={{ position: [0, 0, 6], fov: 50 }}
-                      frameloop={isVisible ? "always" : "never"}
-                      gl={{
-                        preserveDrawingBuffer: true,
-                        antialias: true,
-                        powerPreference: "high-performance",
-                        alpha: true,
-                      }}
-                    >
-                      <Suspense fallback={null}>
-                        <AnimatedPortrait
-                          mouseX={mousePosition.x}
-                          mouseY={mousePosition.y}
-                        />
-                      </Suspense>
-                    </Canvas>
-                  </div>
+                    className="absolute inset-0 bg-gradient-radial from-neon-cyan/15 via-neon-green/5 to-transparent blur-2xl z-10 pointer-events-none"
+                    style={{ animation: "ambientPulse 5s ease-in-out infinite" }}
+                  />
 
-                  {/* Scanlines Overlay */}
-                  {/* <div className="absolute inset-0 pointer-events-none opacity-10">
+                  {/* Floating Particles — CSS only, no framer-motion */}
+                  {[
+                    { size: 4, color: "#39FF14", top: "15%", left: "10%", delay: "0s" },
+                    { size: 6, color: "#00FFFF", top: "25%", right: "15%", delay: "0.5s" },
+                    { size: 3, color: "#FF10F0", top: "60%", left: "20%", delay: "1s" },
+                    { size: 5, color: "#FFD700", top: "70%", right: "25%", delay: "1.5s" },
+                    { size: 4, color: "#39FF14", top: "40%", left: "80%", delay: "2s" },
+                    { size: 3, color: "#00FFFF", top: "80%", right: "10%", delay: "2.5s" },
+                  ].map((p, i) => (
                     <div
-                      className="w-full h-full"
+                      key={i}
+                      className="absolute rounded-full z-20 pointer-events-none"
                       style={{
-                        backgroundImage:
-                          "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(57, 255, 20, 0.1) 2px, rgba(57, 255, 20, 0.1) 4px)",
+                        width: `${p.size}px`,
+                        height: `${p.size}px`,
+                        top: p.top,
+                        left: p.left,
+                        right: p.right,
+                        backgroundColor: p.color,
+                        boxShadow: `0 0 ${p.size * 2}px ${p.color}`,
+                        animation: "particleFloat 4s ease-in-out infinite",
+                        animationDelay: p.delay,
                       }}
                     />
-                  </div> */}
+                  ))}
 
-                  {/* Vignette Effect */}
-                  <div className="absolute inset-0 pointer-events-none bg-gradient-radial from-transparent via-transparent to-cyber-dark/50" />
+                  {/* Frame */}
+                  <div
+                    className="absolute inset-4 border-2 border-neon-green/30 rounded-lg z-30 pointer-events-none"
+                    style={{ animation: "framePulse 3s ease-in-out infinite" }}
+                  >
+                    <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-neon-green" />
+                    <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-neon-cyan" />
+                    <div className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-neon-pink" />
+                    <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-neon-green" />
+                  </div>
+
+                  {/* Scan sweep — CSS */}
+                  <div
+                    className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-green/5 to-transparent z-25 pointer-events-none"
+                    style={{
+                      animation: "scanSweep 8s linear infinite",
+                      filter: "blur(1px)",
+                    }}
+                  />
+
+                  {/* Vignette */}
+                  <div className="absolute inset-0 pointer-events-none bg-gradient-radial from-transparent via-transparent to-cyber-dark/40 z-40" />
                 </div>
 
-                {/* Corner Brackets */}
-                <div className="absolute top-6 left-6 w-8 h-8 border-l-2 border-t-2 border-neon-green/50" />
-                <div className="absolute top-6 right-6 w-8 h-8 border-r-2 border-t-2 border-neon-cyan/50" />
-                <div className="absolute bottom-6 left-6 w-8 h-8 border-l-2 border-b-2 border-neon-pink/50" />
-                <div className="absolute bottom-6 right-6 w-8 h-8 border-r-2 border-b-2 border-neon-green/50" />
+                {/* Outer Corner Brackets */}
+                <div className="absolute top-6 left-6 w-8 h-8 border-l-2 border-t-2 border-neon-green/50 pointer-events-none" />
+                <div className="absolute top-6 right-6 w-8 h-8 border-r-2 border-t-2 border-neon-cyan/50 pointer-events-none" />
+                <div className="absolute bottom-6 left-6 w-8 h-8 border-l-2 border-b-2 border-neon-pink/50 pointer-events-none" />
+                <div className="absolute bottom-6 right-6 w-8 h-8 border-r-2 border-b-2 border-neon-green/50 pointer-events-none" />
               </Card>
             </motion.div>
           </div>
@@ -605,17 +289,9 @@ const About = () => {
               </div>
             </div>
 
-            <motion.div
-              variants={STAGGER_CONTAINER}
-              className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
-            >
+            <motion.div variants={STAGGER_CONTAINER} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {highlights.map((highlight, index) => (
-                <HighlightCard
-                  key={index}
-                  highlight={highlight}
-                  index={index}
-                  playSound={playSound}
-                />
+                <HighlightCard key={index} highlight={highlight} index={index} />
               ))}
             </motion.div>
           </motion.div>
@@ -623,7 +299,30 @@ const About = () => {
       </div>
 
       {/* Bottom Decorative Line */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-green to-transparent opacity-30" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-green to-transparent opacity-30 pointer-events-none" />
+
+      <style>{`
+        @keyframes iconFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes ambientPulse {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(1.05); }
+        }
+        @keyframes particleFloat {
+          0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+          50% { transform: translateY(-15px) translateX(5px); opacity: 0.8; }
+        }
+        @keyframes framePulse {
+          0%, 100% { border-color: rgba(57, 255, 20, 0.3); }
+          50% { border-color: rgba(0, 255, 255, 0.5); }
+        }
+        @keyframes scanSweep {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
+        }
+      `}</style>
     </section>
   );
 };

@@ -342,7 +342,7 @@ const Projects = () => {
           {/* Category Filters */}
           <motion.div
             variants={FADE_IN_UP}
-            className="flex flex-wrap justify-center gap-3 mb-12"
+            className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 sm:mb-12"
           >
             {categories.map((category) => (
               <motion.button
@@ -371,7 +371,7 @@ const Projects = () => {
             initial="hidden"
             animate="visible"
             layout
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8"
           >
             <AnimatePresence mode="wait">
               {filteredProjects.map((project, index) => (

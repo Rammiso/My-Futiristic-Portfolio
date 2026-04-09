@@ -1,7 +1,4 @@
 import { motion } from "framer-motion";
-import { useRef, Suspense } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Sphere } from "@react-three/drei";
 import { Link } from "react-scroll";
 import {
   IoMail,
@@ -12,39 +9,32 @@ import {
   IoChatbubbles,
 } from "react-icons/io5";
 import { FaTelegram, FaLinkedin, FaFacebook } from "react-icons/fa";
-import * as THREE from "three";
 
-// 3D Pulsing Light Orb
-const PulsingOrb = () => {
-  const orbRef = useRef();
-  const glowRef = useRef();
-
-  useFrame((state) => {
-    if (orbRef.current) {
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.2;
-      orbRef.current.scale.set(pulse, pulse, pulse);
-
-      // Subtle float
-      orbRef.current.position.y = Math.sin(state.clock.elapsedTime * 1.5) * 0.3;
-    }
-
-    if (glowRef.current) {
-      const glowPulse = 1.5 + Math.sin(state.clock.elapsedTime * 2) * 0.3;
-      glowRef.current.scale.set(glowPulse, glowPulse, glowPulse);
-    }
-  });
-
-  return (
-    <group>
-      <Sphere ref={orbRef} args={[0.5, 32, 32]}>
-        <meshBasicMaterial color="#00FFFF" transparent opacity={0.8} />
-      </Sphere>
-      <Sphere ref={glowRef} args={[0.7, 16, 16]}>
-        <meshBasicMaterial color="#00FFFF" transparent opacity={0.2} />
-      </Sphere>
-    </group>
-  );
-};
+// CSS-only pulsing orb — replaces Three.js PulsingOrb (removes ~500KB bundle weight)
+const PulsingOrb = () => (
+  <div className="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+    <div
+      className="absolute inset-0 rounded-full bg-neon-cyan/20 animate-ping"
+      style={{ animationDuration: "2s" }}
+    />
+    <div
+      className="absolute inset-2 rounded-full bg-neon-cyan/30"
+      style={{
+        boxShadow: "0 0 20px #00FFFF, 0 0 40px rgba(0,255,255,0.3)",
+        animation: "orbFloat 3s ease-in-out infinite",
+      }}
+    />
+    <div className="relative w-6 h-6 rounded-full bg-neon-cyan/80"
+      style={{ boxShadow: "0 0 12px #00FFFF" }}
+    />
+    <style>{`
+      @keyframes orbFloat {
+        0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; }
+        50% { transform: translateY(-4px) scale(1.1); opacity: 1; }
+      }
+    `}</style>
+  </div>
+);
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -133,21 +123,7 @@ const Footer = () => {
             className="lg:col-span-1"
           >
             <div className="flex items-start gap-4">
-              {/* 3D Orb */}
-              <div className="w-20 h-20 flex-shrink-0">
-                <Canvas camera={{ position: [0, 0, 3] }}>
-                  <Suspense fallback={null}>
-                    <ambientLight intensity={0.5} />
-                    <pointLight
-                      position={[5, 5, 5]}
-                      intensity={1}
-                      color="#00FFFF"
-                    />
-                    <PulsingOrb />
-                  </Suspense>
-                </Canvas>
-              </div>
-
+              <PulsingOrb />
               <div>
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-neon-cyan to-neon-green bg-clip-text text-transparent mb-2">
                   Musab
@@ -225,11 +201,7 @@ const Footer = () => {
                       {social.label}
                     </p>
                   </div>
-                  <motion.div
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-1.5 h-1.5 rounded-full bg-neon-green flex-shrink-0"
-                  />
+                  <div className="w-1.5 h-1.5 rounded-full bg-neon-green flex-shrink-0 animate-pulse" />
                 </motion.a>
               ))}
             </div>
@@ -245,33 +217,20 @@ const Footer = () => {
           className="pt-8 border-t border-white/10"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            {/* Copyright */}
             <div className="flex items-center gap-3">
-              <motion.div
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-2 h-2 rounded-full bg-neon-cyan"
-              />
+              <div className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
               <p className="text-sm text-white/60">
                 © {currentYear}{" "}
                 <span className="text-neon-cyan font-semibold">Musab</span> —
                 All Rights Reserved.
               </p>
             </div>
-
-            {/* Built With */}
             <div className="flex items-center gap-2">
               <p className="text-sm text-white/60">
                 Built with <span className="text-neon-pink">Passion</span> and{" "}
                 <span className="text-neon-green">Love</span>
               </p>
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="text-neon-pink"
-              >
-                ♥
-              </motion.div>
+              <span className="text-neon-pink animate-pulse">♥</span>
             </div>
           </div>
         </motion.div>

@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
-import { useState, useRef, Suspense } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Sphere, Torus, Octahedron } from "@react-three/drei";
+import { useState } from "react";
 import Card from "@components/ui/Card.jsx";
 import { FADE_IN_UP, STAGGER_CONTAINER } from "@utils/constants.js";
 import {
@@ -14,232 +12,150 @@ import {
   IoGitNetwork,
   IoCube,
 } from "react-icons/io5";
-import * as THREE from "three";
 
-// 3D Energy Core Orb Component
-const EnergyCore = ({ color, hovered, variant = "sphere" }) => {
-  const meshRef = useRef();
-  const glowRef = useRef();
+// CSS 3D icon replaces Three.js Canvas per card (~500KB saved per instance)
+const EnergyIcon = ({ color, icon, hovered }) => (
+  <div
+    className="relative h-36 mb-6 rounded-lg flex items-center justify-center overflow-hidden"
+    style={{
+      background: `radial-gradient(ellipse at center, ${color}15 0%, transparent 70%)`,
+      border: `1px solid ${color}30`,
+    }}
+  >
+    {/* Holographic grid */}
+    <div
+      className="absolute inset-0 opacity-20 pointer-events-none"
+      style={{
+        backgroundImage: `
+          linear-gradient(${color}40 1px, transparent 1px),
+          linear-gradient(90deg, ${color}40 1px, transparent 1px)
+        `,
+        backgroundSize: "20px 20px",
+      }}
+    />
 
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.elapsedTime * 0.2;
-      meshRef.current.rotation.y = state.clock.elapsedTime * 0.3;
+    {/* Rotating ring */}
+    <div
+      className="absolute w-24 h-24 rounded-full border pointer-events-none"
+      style={{
+        borderColor: `${color}40`,
+        animation: "spin 8s linear infinite",
+      }}
+    />
+    <div
+      className="absolute w-16 h-16 rounded-full border pointer-events-none"
+      style={{
+        borderColor: `${color}30`,
+        animation: "spin 5s linear infinite reverse",
+      }}
+    />
 
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
-      meshRef.current.scale.set(pulse, pulse, pulse);
-    }
+    {/* Icon */}
+    <div
+      className="relative z-10 text-5xl transition-transform duration-300"
+      style={{
+        color,
+        filter: `drop-shadow(0 0 12px ${color})`,
+        transform: hovered ? "scale(1.2)" : "scale(1)",
+        animation: "iconFloat 3s ease-in-out infinite",
+      }}
+    >
+      {icon}
+    </div>
 
-    if (glowRef.current) {
-      const levitation = Math.sin(state.clock.elapsedTime * 1.5) * 0.2;
-      glowRef.current.position.y = levitation;
+    {/* Scan line */}
+    <div
+      className="absolute left-0 right-0 h-px pointer-events-none"
+      style={{
+        background: `linear-gradient(90deg, transparent, ${color}80, transparent)`,
+        animation: "scanSweepH 3s linear infinite",
+      }}
+    />
+  </div>
+);
 
-      const glowPulse = hovered ? 1.3 : 1;
-      glowRef.current.scale.set(glowPulse, glowPulse, glowPulse);
-    }
-  });
-
-  const GeometryComponent =
-    variant === "sphere" ? Sphere : variant === "torus" ? Torus : Octahedron;
-  const args = variant === "torus" ? [0.5, 0.2, 16, 32] : [0.6, 32, 32];
-
-  return (
-    <group>
-      <GeometryComponent ref={meshRef} args={args}>
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={hovered ? 0.8 : 0.5}
-          roughness={0.3}
-          metalness={0.7}
-          wireframe
-        />
-      </GeometryComponent>
-
-      <Sphere ref={glowRef} args={[0.8, 16, 16]}>
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={hovered ? 0.3 : 0.15}
-        />
-      </Sphere>
-
-      {/* Particle Ring */}
-      <Torus args={[1.2, 0.02, 16, 32]} rotation={[Math.PI / 2, 0, 0]}>
-        <meshBasicMaterial color={color} transparent opacity={0.4} />
-      </Torus>
-    </group>
-  );
-};
-
-// Service Card Component
 const ServiceCard = ({ service, index }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div
       variants={FADE_IN_UP}
-      whileHover={{ y: -12, scale: 1.02 }}
+      whileHover={{ y: -8, scale: 1.02 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       className="group h-full"
     >
       <Card
         variant="glass"
-        className={`p-6 h-full relative overflow-hidden transition-all duration-500 ${
-          isHovered
-            ? "border-neon-green/60 shadow-2xl shadow-neon-green/20"
-            : "border-white/10"
+        className={`p-5 sm:p-6 h-full relative overflow-hidden transition-all duration-500 ${
+          isHovered ? "border-neon-green/60 shadow-2xl shadow-neon-green/20" : "border-white/10"
         }`}
       >
         {/* Corner Brackets */}
-        <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-neon-green/30 z-10" />
-        <div className="absolute top-2 right-2 w-6 h-6 border-r-2 border-t-2 border-neon-cyan/30 z-10" />
-        <div className="absolute bottom-2 left-2 w-6 h-6 border-l-2 border-b-2 border-neon-pink/30 z-10" />
-        <div className="absolute bottom-2 right-2 w-6 h-6 border-r-2 border-b-2 border-neon-green/30 z-10" />
+        <div className="absolute top-2 left-2 w-5 h-5 border-l-2 border-t-2 border-neon-green/30 z-10" />
+        <div className="absolute top-2 right-2 w-5 h-5 border-r-2 border-t-2 border-neon-cyan/30 z-10" />
+        <div className="absolute bottom-2 left-2 w-5 h-5 border-l-2 border-b-2 border-neon-pink/30 z-10" />
+        <div className="absolute bottom-2 right-2 w-5 h-5 border-r-2 border-b-2 border-neon-green/30 z-10" />
 
-        {/* Neon Glow Effect */}
-        <motion.div
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          className="absolute inset-0 bg-gradient-radial from-neon-green/20 via-transparent to-transparent blur-xl"
+        {/* Hover glow */}
+        <div
+          className="absolute inset-0 bg-gradient-radial from-neon-green/20 via-transparent to-transparent blur-xl transition-opacity duration-300 pointer-events-none"
+          style={{ opacity: isHovered ? 1 : 0 }}
         />
 
         {/* Scanlines */}
-        <div className="absolute inset-0 pointer-events-none opacity-5">
+        <div
+          className="absolute inset-0 pointer-events-none opacity-5"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(57, 255, 20, 0.15) 2px, rgba(57, 255, 20, 0.15) 4px)",
+          }}
+        />
+
+        {/* CSS Energy Icon */}
+        <EnergyIcon color={service.color} icon={service.icon} hovered={isHovered} />
+
+        {/* Category badge */}
+        <div className="flex items-center gap-2 mb-3 relative z-10">
           <div
-            className="w-full h-full"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(57, 255, 20, 0.15) 2px, rgba(57, 255, 20, 0.15) 4px)",
-            }}
+            className="w-2 h-2 rounded-full animate-pulse"
+            style={{ backgroundColor: service.color }}
           />
-        </div>
-
-        {/* 3D Energy Core */}
-        <div className="relative h-40 mb-6 z-10">
-          <motion.div
-            animate={{
-              boxShadow: isHovered
-                ? `0 0 40px ${service.color}80`
-                : `0 0 20px ${service.color}40`,
-            }}
-            className="absolute inset-0 rounded-lg"
-          >
-            <Canvas camera={{ position: [0, 0, 3] }}>
-              <Suspense fallback={null}>
-                <ambientLight intensity={0.5} />
-                <pointLight
-                  position={[5, 5, 5]}
-                  intensity={1.5}
-                  color={service.color}
-                />
-                <pointLight
-                  position={[-5, -5, -5]}
-                  intensity={0.8}
-                  color={service.color}
-                />
-                <EnergyCore
-                  color={service.color}
-                  hovered={isHovered}
-                  variant={service.variant}
-                />
-              </Suspense>
-            </Canvas>
-          </motion.div>
-
-          {/* Holographic Grid Overlay */}
-          <div className="absolute inset-0 opacity-20 pointer-events-none">
-            <div
-              className="w-full h-full"
-              style={{
-                backgroundImage: `
-                  linear-gradient(${service.color}40 1px, transparent 1px),
-                  linear-gradient(90deg, ${service.color}40 1px, transparent 1px)
-                `,
-                backgroundSize: "20px 20px",
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Icon Header */}
-        <div className="flex items-center gap-4 mb-4 relative z-10">
-          <motion.div
-            animate={{
-              boxShadow: isHovered
-                ? `0 0 20px ${service.color}`
-                : `0 0 0px ${service.color}`,
-            }}
-            className="w-12 h-12 rounded-lg glass flex items-center justify-center text-2xl transition-all duration-300"
+          <span
+            className="text-xs font-mono uppercase tracking-wider"
             style={{ color: service.color }}
           >
-            {service.icon}
-          </motion.div>
-
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <motion.div
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  delay: index * 0.2,
-                }}
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: service.color }}
-              />
-              <span
-                className="text-xs font-mono uppercase tracking-wider"
-                style={{ color: service.color }}
-              >
-                {service.category}
-              </span>
-            </div>
-          </div>
+            {service.category}
+          </span>
         </div>
 
-        {/* Title */}
-        <h3 className="text-xl font-bold text-white mb-3 relative z-10 group-hover:text-neon-green transition-colors">
+        <h3 className="text-lg sm:text-xl font-bold text-white mb-3 relative z-10 group-hover:text-neon-green transition-colors">
           {service.title}
         </h3>
 
-        {/* Description */}
         <p className="text-white/60 text-sm leading-relaxed mb-4 relative z-10">
           {service.description}
         </p>
 
-        {/* Features */}
         <ul className="space-y-2 relative z-10">
           {service.features.map((feature, i) => (
-            <motion.li
-              key={i}
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="flex items-center gap-2 text-sm text-white/50"
-            >
-              <div
-                className="w-1 h-1 rounded-full"
-                style={{ backgroundColor: service.color }}
-              />
+            <li key={i} className="flex items-center gap-2 text-sm text-white/50">
+              <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: service.color }} />
               {feature}
-            </motion.li>
+            </li>
           ))}
         </ul>
 
-        {/* Hover Indicator */}
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: isHovered ? 1 : 0 }}
-          className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-neon-green to-transparent"
-          style={{ originX: 0.5 }}
+        {/* Bottom hover bar */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-neon-green to-transparent transition-transform duration-300 origin-center"
+          style={{ transform: isHovered ? "scaleX(1)" : "scaleX(0)" }}
         />
       </Card>
     </motion.div>
   );
 };
 
-// Main Services Component
 const Services = () => {
   const servicesData = [
     {
@@ -247,138 +163,87 @@ const Services = () => {
       title: "Full-Stack MERN Development",
       category: "Development",
       description:
-        "End-to-end web application engineering with MongoDB, Express, React, and Node.js. Crafting scalable architectures, neon-inspired holographic UIs, and seamless database integration for next-generation digital experiences.",
+        "End-to-end web application engineering with MongoDB, Express, React, and Node.js. Scalable architectures and seamless database integration.",
       icon: <IoCode />,
       color: "#39FF14",
-      variant: "sphere",
-      features: [
-        "Holographic UI/UX design",
-        "RESTful API architecture",
-        "Real-time data systems",
-        "Cloud deployment & scaling",
-      ],
+      features: ["Holographic UI/UX design", "RESTful API architecture", "Real-time data systems", "Cloud deployment & scaling"],
     },
     {
       id: 2,
       title: "AI-Powered Solutions",
       category: "Artificial Intelligence",
       description:
-        "Advanced AI integration leveraging large language models, vector embeddings, and intelligent automation. Building context-aware chat systems, semantic search engines, and futuristic AI-driven experiences.",
+        "Advanced AI integration leveraging large language models, vector embeddings, and intelligent automation for context-aware systems.",
       icon: <IoHardwareChip />,
       color: "#00FFFF",
-      variant: "octahedron",
-      features: [
-        "LLM integration (OpenAI, Claude)",
-        "RAG & vector databases",
-        "Intelligent automation",
-        "Conversational AI systems",
-      ],
+      features: ["LLM integration (OpenAI, Claude)", "RAG & vector databases", "Intelligent automation", "Conversational AI systems"],
     },
     {
       id: 3,
       title: "UI/UX Design & Prototyping",
       category: "Design",
       description:
-        "User-centered design philosophy with glassmorphic aesthetics, micro-interactions, and intuitive navigation. Creating wireframes, prototypes, and production-ready interfaces that prioritize accessibility and user experience.",
+        "User-centered design with glassmorphic aesthetics, micro-interactions, and intuitive navigation. Accessibility-first approach.",
       icon: <IoColorPalette />,
       color: "#FF10F0",
-      variant: "torus",
-      features: [
-        "Glassmorphic layouts",
-        "Interactive prototyping",
-        "Design system creation",
-        "Accessibility-first approach",
-      ],
+      features: ["Glassmorphic layouts", "Interactive prototyping", "Design system creation", "Accessibility-first approach"],
     },
     {
       id: 4,
       title: "Mobile App Development",
       category: "Mobile",
       description:
-        "Cross-platform mobile applications with React Native. Delivering smooth animations, responsive layouts, native device features, and offline-first architecture for iOS and Android platforms.",
+        "Cross-platform mobile applications with React Native. Smooth animations, native device features, and offline-first architecture.",
       icon: <IoPhonePortrait />,
       color: "#FFA500",
-      variant: "sphere",
-      features: [
-        "React Native development",
-        "Native performance optimization",
-        "Offline-first architecture",
-        "Push notifications & deep linking",
-      ],
+      features: ["React Native development", "Native performance optimization", "Offline-first architecture", "Push notifications & deep linking"],
     },
     {
       id: 5,
       title: "Backend & API Engineering",
       category: "Infrastructure",
       description:
-        "High-performance backend systems with secure authentication, optimized databases, and cloud-ready infrastructure. Building RESTful and GraphQL APIs with industry-standard security protocols.",
+        "High-performance backend systems with secure authentication, optimized databases, and cloud-ready infrastructure.",
       icon: <IoServer />,
       color: "#39FF14",
-      variant: "octahedron",
-      features: [
-        "Scalable API architecture",
-        "JWT & OAuth authentication",
-        "Database optimization",
-        "Microservices design",
-      ],
+      features: ["Scalable API architecture", "JWT & OAuth authentication", "Database optimization", "Microservices design"],
     },
     {
       id: 6,
-      title: "Consulting & System Architecture",
+      title: "Consulting & Architecture",
       category: "Strategy",
       description:
-        "Technical advisory for startups and enterprises. Designing stable, scalable, and maintainable system architectures. Providing code reviews, performance audits, and technology stack recommendations.",
+        "Technical advisory for startups and enterprises. Designing stable, scalable architectures with code reviews and performance audits.",
       icon: <IoBulb />,
       color: "#00FFFF",
-      variant: "torus",
-      features: [
-        "Architecture planning",
-        "Code quality audits",
-        "Performance optimization",
-        "Tech stack consulting",
-      ],
+      features: ["Architecture planning", "Code quality audits", "Performance optimization", "Tech stack consulting"],
     },
     {
       id: 7,
       title: "Neural Data Automation",
       category: "AI Automation",
       description:
-        "Autonomous data processing pipelines powered by machine learning. Intelligent workflow automation, predictive analytics, and adaptive decision-making systems that evolve with your data patterns.",
+        "Autonomous data processing pipelines powered by machine learning. Intelligent workflow automation and predictive analytics.",
       icon: <IoGitNetwork />,
       color: "#FF10F0",
-      variant: "sphere",
-      features: [
-        "Automated data workflows",
-        "Predictive ML models",
-        "Intelligent task scheduling",
-        "Adaptive algorithms",
-      ],
+      features: ["Automated data workflows", "Predictive ML models", "Intelligent task scheduling", "Adaptive algorithms"],
     },
     {
       id: 8,
       title: "Holographic Interface Engineering",
       category: "Emerging Tech",
       description:
-        "Next-generation 3D interfaces using WebGL, Three.js, and React Three Fiber. Crafting immersive experiences with spatial computing, AR/VR integration, and holographic projection systems.",
+        "Next-generation 3D interfaces using WebGL and immersive web technologies. Crafting spatial computing and AR/VR experiences.",
       icon: <IoCube />,
       color: "#FFA500",
-      variant: "octahedron",
-      features: [
-        "3D WebGL experiences",
-        "AR/VR prototyping",
-        "Spatial UI design",
-        "Real-time 3D rendering",
-      ],
+      features: ["3D WebGL experiences", "AR/VR prototyping", "Spatial UI design", "Real-time 3D rendering"],
     },
   ];
 
   return (
-    <section
-      id="services"
-      className="section-padding bg-cyber-darker relative overflow-hidden"
-    >
-      {/* Animated Grid Background */}
-      <div className="absolute inset-0 opacity-10">
+    <section id="services" className="section-padding bg-cyber-darker relative overflow-hidden">
+      {/* Background Grid */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div
           className="absolute inset-0"
           style={{
@@ -391,13 +256,13 @@ const Services = () => {
         />
       </div>
 
-      {/* Floating Gradient Orbs */}
-      <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-neon-green/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-neon-cyan/10 rounded-full blur-3xl" />
+      {/* Ambient Orbs */}
+      <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-neon-green/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-neon-cyan/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* HUD Corner Elements */}
-      <div className="absolute top-8 left-8 w-20 h-20 border-l-2 border-t-2 border-neon-green/20" />
-      <div className="absolute top-8 right-8 w-20 h-20 border-r-2 border-t-2 border-neon-cyan/20" />
+      {/* HUD Corners */}
+      <div className="absolute top-8 left-8 w-16 h-16 border-l-2 border-t-2 border-neon-green/20 pointer-events-none" />
+      <div className="absolute top-8 right-8 w-16 h-16 border-r-2 border-t-2 border-neon-cyan/20 pointer-events-none" />
 
       <div className="container-custom relative z-10">
         <motion.div
@@ -407,54 +272,40 @@ const Services = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           {/* Section Header */}
-          <div className="text-center mb-16">
-            <motion.div
-              variants={FADE_IN_UP}
-              className="flex items-center justify-center gap-3 mb-4"
-            >
+          <div className="text-center mb-12 sm:mb-16">
+            <motion.div variants={FADE_IN_UP} className="flex items-center justify-center gap-3 mb-4">
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-neon-cyan" />
-              <span className="text-sm font-mono text-neon-cyan uppercase tracking-wider">
-                Service Console
-              </span>
+              <span className="text-sm font-mono text-neon-cyan uppercase tracking-wider">Service Console</span>
               <div className="h-px w-12 bg-gradient-to-l from-transparent to-neon-cyan" />
             </motion.div>
 
-            <motion.h2 variants={FADE_IN_UP} className="section-title">
-              What I Offer
-            </motion.h2>
+            <motion.h2 variants={FADE_IN_UP} className="section-title">What I Offer</motion.h2>
 
-            <motion.p
-              variants={FADE_IN_UP}
-              className="text-white/60 max-w-2xl mx-auto leading-relaxed"
-            >
+            <motion.p variants={FADE_IN_UP} className="text-white/60 max-w-2xl mx-auto leading-relaxed">
               Comprehensive solutions from concept to deployment
             </motion.p>
           </div>
 
-          {/* Services Grid */}
+          {/* Services Grid — responsive: 1 col mobile, 2 tablet, 3 desktop, 4 xl */}
           <motion.div
             variants={STAGGER_CONTAINER}
-            className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 lg:gap-8"
           >
             {servicesData.map((service, index) => (
               <ServiceCard key={service.id} service={service} index={index} />
             ))}
           </motion.div>
 
-          {/* CTA Section */}
-          <motion.div variants={FADE_IN_UP} className="mt-20 text-center">
-            <Card variant="glass" className="p-8 inline-block">
-              <h3 className="text-2xl font-bold text-white mb-3">
-                Ready to start your project?
-              </h3>
-              <p className="text-white/60 mb-6 max-w-md">
-                Let's collaborate to build something extraordinary
-              </p>
+          {/* CTA */}
+          <motion.div variants={FADE_IN_UP} className="mt-16 sm:mt-20 text-center">
+            <Card variant="glass" className="p-6 sm:p-8 inline-block max-w-md w-full">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to start your project?</h3>
+              <p className="text-white/60 mb-6 text-sm sm:text-base">Let's collaborate to build something extraordinary</p>
               <motion.a
                 href="#contact"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-block px-8 py-3 glass border-2 border-neon-green rounded-lg text-neon-green font-semibold uppercase tracking-wider hover:bg-neon-green/10 transition-all duration-300"
+                className="inline-block px-6 sm:px-8 py-3 glass border-2 border-neon-green rounded-lg text-neon-green font-semibold uppercase tracking-wider hover:bg-neon-green/10 transition-all duration-300 text-sm sm:text-base"
               >
                 Get In Touch
               </motion.a>
@@ -463,8 +314,22 @@ const Services = () => {
         </motion.div>
       </div>
 
-      {/* Bottom Decorative Line */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-30" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-30 pointer-events-none" />
+
+      <style>{`
+        @keyframes scanSweepH {
+          0% { top: 0%; }
+          100% { top: 100%; }
+        }
+        @keyframes iconFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </section>
   );
 };

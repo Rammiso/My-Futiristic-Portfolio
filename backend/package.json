@@ -36,7 +36,7 @@
     "mongodb": "^7.0.0",
     "mongoose": "^8.20.1",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.9.7",
+    "nodemailer": "^8.0.5",
     "slugify": "^1.6.6",
     "xss-clean": "^0.1.4"
   },

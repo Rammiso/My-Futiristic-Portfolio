@@ -66,9 +66,9 @@ const Modal = ({
             >
               {/* Header */}
               {(title || showCloseButton) && (
-                <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/10">
                   {title && (
-                    <h2 className="text-2xl font-bold text-neon-green">
+                    <h2 className="text-lg sm:text-2xl font-bold text-neon-green pr-4">
                       {title}
                     </h2>
                   )}
@@ -85,7 +85,7 @@ const Modal = ({
               )}
 
               {/* Content */}
-              <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
                 {children}
               </div>
             </motion.div>

@@ -272,7 +272,7 @@ const CategoryHeader = ({ title, icon, color = "#39FF14" }) => {
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <span className="text-3xl">{icon}</span>
-            <h3 className="text-2xl font-bold text-white">{title}</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-white">{title}</h3>
           </div>
           <div className="h-px mt-2 bg-gradient-to-r from-white/20 to-transparent" />
         </div>

@@ -20,7 +20,7 @@ const Button = ({
     secondary:
       "bg-transparent border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black before:absolute before:inset-0 before:bg-neon-cyan before:translate-x-full before:transition-transform before:duration-300 hover:before:translate-x-0",
     outline:
-      "bg-transparent border-2 border-white/20 text-white hover:border-neon-green hover:text-neon-green",
+      "bg-transparent border-2 border-white/20 hover:border-neon-green hover:text-neon-green",
     solid:
       "bg-neon-green text-black border-2 border-neon-green hover:bg-transparent hover:text-neon-green",
   };
