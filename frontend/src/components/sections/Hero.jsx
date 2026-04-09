@@ -1,5 +1,6 @@
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import musabImg from "@assets/MUSAB.png";
 import { IoDownload, IoMail, IoArrowForward } from "react-icons/io5";
 import { Link } from "react-scroll";
 import Button from "@components/ui/Button.jsx";
@@ -16,7 +17,7 @@ const Hero = () => {
 
   // Typing animation — continuous loop
   useEffect(() => {
-    const fullText = "Full Stack Developer | AI Engineer | UI/UX Designer";
+    const fullText = "Full Stack Developer | AI | Flutter Developer";
     let index = 0;
     let isDeleting = false;
     let timer;
@@ -118,9 +119,9 @@ const Hero = () => {
           >
             {/* Status */}
             <motion.div variants={itemVariants} className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse" />
-              <span className="text-neon-green text-sm font-mono uppercase tracking-wider">
-                System Online
+              <div className="w-4 h-4 bg-neon-green rounded-full animate-pulse" />
+<span className="text-neon-green text-xl font-mono uppercase tracking-wider">
+                Hey, I'm...
               </span>
             </motion.div>
 
