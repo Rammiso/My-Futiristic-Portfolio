@@ -108,8 +108,8 @@ const Hero = () => {
       />
 
       {/* Main Content */}
-      <div className="container-custom relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container-custom relative z-10 px-4">
+        <div className="grid lg:grid-cols-2 gap-6 items-center">
           {/* Left Content */}
           <motion.div
             variants={containerVariants}
@@ -263,7 +263,7 @@ const Hero = () => {
             </div>
 
             {/* Portrait frame */}
-            <div className="relative w-72 h-80 lg:w-80 lg:h-96">
+        <div className="relative w-[28rem] h-[32rem] lg:w-[32rem] lg:h-[36rem]">
               {/* Neon border glow layers */}
               <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-neon-green via-neon-cyan to-neon-pink opacity-60 blur-md pointer-events-none" />
               <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-br from-neon-green via-neon-cyan to-neon-pink opacity-80 pointer-events-none" />
