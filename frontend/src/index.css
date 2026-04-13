@@ -36,29 +36,37 @@
    CSS VARIABLES — Light theme overrides
    ============================================= */
 .light {
-  --color-neon-green: #16a34a;   /* toned-down green for light bg */
-  --color-neon-cyan:  #0891b2;   /* teal */
-  --color-neon-pink:  #db2777;   /* pink */
+  --color-neon-green: #059669;   /* emerald — readable on light */
+  --color-neon-cyan:  #0284c7;   /* sky blue */
+  --color-neon-pink:  #be185d;   /* rose */
+
+  /* Accent glow colors (used in box-shadow / filter) */
+  --glow-green:  rgba(5, 150, 105, 0.25);
+  --glow-cyan:   rgba(2, 132, 199, 0.25);
+  --glow-pink:   rgba(190, 24, 93, 0.2);
 
   /* Backgrounds */
-  --bg-darker:  #f0f4ff;
-  --bg-dark:    #e2e8f8;
+  --bg-darker:  #f1f5fb;
+  --bg-dark:    #e8eef8;
   --bg-card:    #ffffff;
   --bg-border:  #cbd5e1;
 
   /* Text */
   --text-primary:   #0f172a;
-  --text-secondary: rgba(15,23,42,0.75);
-  --text-muted:     rgba(15,23,42,0.45);
+  --text-secondary: rgba(15,23,42,0.72);
+  --text-muted:     rgba(15,23,42,0.42);
 
-  /* Glass surfaces */
-  --glass-bg:          rgba(255,255,255,0.7);
-  --glass-dark-bg:     rgba(255,255,255,0.5);
-  --glass-border:      rgba(15,23,42,0.12);
-  --glass-dark-border: rgba(15,23,42,0.08);
+  /* Glass surfaces — frosted white */
+  --glass-bg:          rgba(255,255,255,0.75);
+  --glass-dark-bg:     rgba(255,255,255,0.6);
+  --glass-border:      rgba(15,23,42,0.1);
+  --glass-dark-border: rgba(15,23,42,0.07);
+
+  /* Grid line color for backgrounds */
+  --grid-line: rgba(2, 132, 199, 0.08);
 
   /* Scrollbar */
-  --scrollbar-track: #e2e8f8;
+  --scrollbar-track: #e8eef8;
 }
 
 /* =============================================
@@ -155,13 +163,249 @@ body {
 
 /* Light mode: border overrides */
 .light .border-white\/10 { border-color: rgba(15,23,42,0.1) !important; }
-.light .border-white\/20 { border-color: rgba(15,23,42,0.2) !important; }
+.light .border-white\/20 { border-color: rgba(15,23,42,0.15) !important; }
 
 /* Light mode: input backgrounds */
 .light input,
 .light textarea {
-  background-color: rgba(255,255,255,0.8) !important;
+  background-color: rgba(255,255,255,0.9) !important;
   color: var(--text-primary) !important;
+  border-color: rgba(15,23,42,0.15) !important;
+}
+
+/* =============================================
+   Light Mode — Futuristic & Professional
+   All CSS, zero JS overhead
+   ============================================= */
+
+/* --- Body & base --- */
+.light body {
+  background-color: var(--bg-darker);
+}
+
+/* Subtle dot-grid background on the whole page */
+.light body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle, rgba(2,132,199,0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 1;
+}
+
+/* --- Navbar --- */
+.light nav.glass-dark,
+.light nav {
+  background: rgba(241,245,251,0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  border-bottom-color: rgba(2,132,199,0.15) !important;
+  box-shadow: 0 1px 24px rgba(2,132,199,0.08) !important;
+}
+
+/* Nav top edge line in light mode */
+.light nav .bg-gradient-to-r.via-neon-green {
+  background: linear-gradient(90deg, transparent, var(--color-neon-cyan), transparent) !important;
+}
+
+/* Nav link active state */
+.light .text-white\/70 { color: var(--text-secondary) !important; }
+
+/* --- Glass cards — frosted with soft shadow --- */
+.light .glass {
+  background: rgba(255,255,255,0.82) !important;
+  border: 1px solid rgba(15,23,42,0.09) !important;
+  box-shadow: 0 4px 24px rgba(2,132,199,0.07), 0 1px 4px rgba(15,23,42,0.06) !important;
+  backdrop-filter: blur(12px) !important;
+}
+.light .glass-dark {
+  background: rgba(255,255,255,0.65) !important;
+  border: 1px solid rgba(15,23,42,0.08) !important;
+  box-shadow: 0 2px 16px rgba(2,132,199,0.06) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Card hover — lift + colored shadow */
+.light .glass:hover,
+.light .cyber-card:hover {
+  box-shadow: 0 8px 40px rgba(2,132,199,0.14), 0 2px 8px rgba(15,23,42,0.08) !important;
+  border-color: rgba(2,132,199,0.2) !important;
+  transform: translateY(-2px);
+}
+
+/* --- Section backgrounds --- */
+.light .bg-cyber-darker { background-color: #f1f5fb !important; }
+.light .bg-cyber-dark   { background-color: #e8eef8 !important; }
+.light .bg-cyber-card   { background-color: #ffffff !important; }
+
+/* --- Background grid lines — light mode version --- */
+.light [style*="rgba(57, 255, 20"],
+.light [style*="rgba(0, 255, 255"] {
+  opacity: 0.6 !important;
+}
+
+/* Override inline grid background colors via a wrapper class */
+.light .section-grid-bg {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) !important;
+}
+
+/* --- Ambient orbs — softer in light mode --- */
+.light .bg-neon-green\/10 { background-color: rgba(5,150,105,0.07) !important; }
+.light .bg-neon-cyan\/10  { background-color: rgba(2,132,199,0.07) !important; }
+.light .bg-neon-pink\/10  { background-color: rgba(190,24,93,0.06) !important; }
+.light .bg-neon-green\/20 { background-color: rgba(5,150,105,0.1) !important; }
+.light .bg-neon-cyan\/20  { background-color: rgba(2,132,199,0.1) !important; }
+
+/* --- HUD corner brackets — visible on light bg --- */
+.light .border-neon-green\/30 { border-color: rgba(5,150,105,0.3) !important; }
+.light .border-neon-green\/20 { border-color: rgba(5,150,105,0.2) !important; }
+.light .border-neon-cyan\/30  { border-color: rgba(2,132,199,0.3) !important; }
+.light .border-neon-cyan\/20  { border-color: rgba(2,132,199,0.2) !important; }
+.light .border-neon-pink\/30  { border-color: rgba(190,24,93,0.25) !important; }
+.light .border-neon-pink\/40  { border-color: rgba(190,24,93,0.3) !important; }
+.light .border-neon-green\/50 { border-color: rgba(5,150,105,0.4) !important; }
+.light .border-neon-cyan\/50  { border-color: rgba(2,132,199,0.4) !important; }
+.light .border-neon-green\/60 { border-color: rgba(5,150,105,0.5) !important; }
+
+/* --- Skill / progress bars — keep colored but softer glow --- */
+.light [style*="box-shadow: 0 0 10px #39FF14"] {
+  box-shadow: 0 0 6px rgba(5,150,105,0.4) !important;
+}
+.light [style*="box-shadow: 0 0 10px #00FFFF"] {
+  box-shadow: 0 0 6px rgba(2,132,199,0.4) !important;
+}
+
+/* --- Scanlines — invisible in light mode (they look dirty) --- */
+.light [style*="repeating-linear-gradient(0deg, transparent, transparent 2px"] {
+  opacity: 0 !important;
+}
+
+/* --- Scan sweep line — softer --- */
+.light [style*="scanSweep"] {
+  opacity: 0.4 !important;
+}
+
+/* --- Section header decorative lines --- */
+.light .bg-gradient-to-r.from-transparent.to-neon-green,
+.light .bg-gradient-to-l.from-transparent.to-neon-green {
+  opacity: 0.7 !important;
+}
+
+/* --- Bottom section divider lines --- */
+.light .via-neon-green.opacity-30,
+.light .via-neon-cyan.opacity-30 {
+  opacity: 0.2 !important;
+}
+
+/* --- Contact form inputs --- */
+.light .bg-black\/30 {
+  background-color: rgba(255,255,255,0.9) !important;
+  border-color: rgba(15,23,42,0.15) !important;
+  color: var(--text-primary) !important;
+}
+.light input::placeholder,
+.light textarea::placeholder {
+  color: rgba(15,23,42,0.3) !important;
+}
+
+/* Floating label background fix in light mode */
+.light .bg-cyber-dark {
+  background-color: #ffffff !important;
+}
+
+/* --- Skill card proficiency bar track --- */
+.light .bg-cyber-card\/50 {
+  background-color: rgba(15,23,42,0.08) !important;
+}
+
+/* --- Tech stack badges in Hero --- */
+.light .glass-dark.border-neon-green\/30 {
+  background: rgba(255,255,255,0.7) !important;
+  border-color: rgba(5,150,105,0.25) !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Scroll indicator line --- */
+.light .via-neon-green {
+  --tw-gradient-via: rgba(5,150,105,0.5) !important;
+}
+
+/* --- Mobile menu panel --- */
+.light .glass-dark.border-neon-green\/30.shadow-2xl {
+  background: rgba(248,250,252,0.95) !important;
+  border-color: rgba(2,132,199,0.2) !important;
+  box-shadow: -8px 0 40px rgba(2,132,199,0.1) !important;
+}
+
+/* --- Futuristic light-mode accent: glowing underline on section titles --- */
+.light .section-title {
+  position: relative;
+}
+.light .section-title::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 2px;
+  margin: 0.5rem auto 0;
+  background: linear-gradient(90deg, var(--color-neon-cyan), var(--color-neon-green));
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--glow-cyan);
+}
+
+/* --- Futuristic card top-edge accent line --- */
+.light .glass .absolute.top-0.left-0.right-0.h-px {
+  background: linear-gradient(90deg, transparent, var(--color-neon-cyan), transparent) !important;
+  opacity: 0.6 !important;
+}
+
+/* --- Stat numbers — colored glow in light mode --- */
+.light .text-neon-green {
+  text-shadow: 0 0 12px var(--glow-green);
+}
+.light .text-neon-cyan {
+  text-shadow: 0 0 12px var(--glow-cyan);
+}
+.light .text-neon-pink {
+  text-shadow: 0 0 10px var(--glow-pink);
+}
+
+/* --- Active nav link indicator dot --- */
+.light .bg-neon-green.rounded-full.animate-pulse {
+  box-shadow: 0 0 8px var(--glow-green);
+}
+
+/* --- Hero portrait glow halo --- */
+.light .from-neon-green\/20 {
+  --tw-gradient-from: rgba(5,150,105,0.12) !important;
+}
+.light .via-neon-cyan\/10 {
+  --tw-gradient-via: rgba(2,132,199,0.08) !important;
+}
+.light .to-neon-pink\/15 {
+  --tw-gradient-to: rgba(190,24,93,0.08) !important;
+}
+
+/* --- Services EnergyIcon grid lines --- */
+.light [style*="linear-gradient(#39FF14"] {
+  opacity: 0.15 !important;
+}
+.light [style*="linear-gradient(#00FFFF"] {
+  opacity: 0.15 !important;
+}
+.light [style*="linear-gradient(#FF10F0"] {
+  opacity: 0.12 !important;
+}
+
+/* --- Smooth theme transition on all elements --- */
+.light *,
+.light *::before,
+.light *::after {
+  transition-property: background-color, border-color, box-shadow, color;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
 }
 
 /* =============================================
@@ -174,9 +418,9 @@ body {
     background-image: linear-gradient(135deg, #ffffff 0%, #94a3b8 50%, #cbd5e1 100%);
   }
 
-  /* Light mode override — deep slate → indigo, professional & readable */
+  /* Light mode override — deep slate → indigo → sky, professional & futuristic */
   .light .text-gradient {
-    background-image: linear-gradient(135deg, #0f172a 0%, #334155 50%, #475569 100%);
+    background-image: linear-gradient(135deg, #0f172a 0%, #1e40af 45%, #0284c7 100%);
   }
 
   .section-padding {
@@ -196,6 +440,13 @@ body {
            overflow-hidden transition-all duration-300;
     @apply bg-transparent border-2 border-neon-green text-neon-green;
     @apply hover:bg-neon-green hover:text-cyber-darker;
+  }
+
+  .cyber-button-secondary {
+    @apply relative px-6 py-3 font-semibold text-sm uppercase tracking-wider
+           overflow-hidden transition-all duration-300;
+    @apply bg-transparent border-2 border-neon-cyan text-neon-cyan;
+    @apply hover:bg-cyber-darker hover:text-neon-cyan hover:border-neon-green;
   }
 
   .cyber-card {

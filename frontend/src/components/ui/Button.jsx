@@ -18,10 +18,10 @@ const Button = ({
     primary:
       "bg-transparent border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-black [&>*]:hover:text-black",
     secondary:
-      "bg-transparent border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black [&>*]:hover:text-black",
+      "bg-transparent border-2 border-neon-cyan text-neon-cyan hover:bg-cyber-darker hover:text-neon-cyan [&>*]:hover:text-neon-cyan secondary-button",
     outline:
       "bg-transparent border-2 border-white/20 hover:border-neon-green hover:text-neon-green",
-    solid: "bg-neon-green text-black border-2 border-neon-green hover:bg-neon-green/80 hover:text-black hover:border-neon-green"
+    solid: "bg-neon-green text-black border-2 border-neon-green hover:bg-transparent hover:text-neon-green hover:border-neon-green"
   };
 
   const sizes = {
@@ -31,17 +31,24 @@ const Button = ({
   };
 
   return (
-    <motion.button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={clsx(baseStyles, variants[variant], sizes[size], className)}
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
-      whileTap={{ scale: disabled ? 1 : 0.98 }}
-      {...props}
-    >
-      {children}
-    </motion.button>
+    <>
+      <style>{`
+        .secondary-button:hover {
+          border-color: #39ff14 !important;
+        }
+      `}</style>
+      <motion.button
+        type={type}
+        onClick={onClick}
+        disabled={disabled}
+        className={clsx(baseStyles, variants[variant], sizes[size], className)}
+        whileHover={{ scale: disabled ? 1 : 1.02 }}
+        whileTap={{ scale: disabled ? 1 : 0.98 }}
+        {...props}
+      >
+        {children}
+      </motion.button>
+    </>
   );
 };
 

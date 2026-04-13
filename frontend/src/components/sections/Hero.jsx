@@ -109,7 +109,7 @@ const Hero = () => {
 
       {/* Main Content */}
       <div className="container-custom relative z-10 px-4">
-        <div className="grid lg:grid-cols-2 gap-6 items-center">
+        <div className="grid lg:grid-cols-[1fr_1.1fr] gap-4 items-center">
           {/* Left Content */}
           <motion.div
             variants={containerVariants}
@@ -163,7 +163,7 @@ const Hero = () => {
               Specializing in{" "}
               <span className="text-neon-green">MERN Stack</span>,{" "}
               <span className="text-neon-cyan">AI Integration</span>, and{" "}
-              <span className="text-neon-pink">Immersive UI/UX</span>.
+              <span className="text-neon-pink">Flutter with NestJS</span>.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -204,7 +204,7 @@ const Hero = () => {
 
             {/* Tech Stack */}
             <motion.div variants={itemVariants} className="flex flex-wrap gap-2 sm:gap-4 pt-4">
-              {["React", "Node.js", "AI", "Express.js"].map((tech) => (
+              {["Next.Js", "Node.js", "AI", "Express.js", "NestJs", "Flutter"].map((tech) => (
                 <div
                   key={tech}
                   className="px-4 py-2 glass-dark border border-neon-green/30 rounded text-xs font-mono"
@@ -220,93 +220,56 @@ const Hero = () => {
             initial={{ opacity: 0, x: 60 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-            className="relative flex items-center justify-center hidden md:flex"
+            className="relative hidden md:flex items-center justify-end pr-0 lg:pr-4"
           >
-            {/* Outer rotating ring */}
-            <div
-              className="absolute w-[420px] h-[420px] rounded-full border border-neon-green/20 pointer-events-none"
-              style={{ animation: "spin 30s linear infinite" }}
-            />
-            {/* Mid rotating ring */}
-            <div
-              className="absolute w-[370px] h-[370px] rounded-full border border-neon-cyan/15 pointer-events-none"
-              style={{ animation: "spin 20s linear infinite reverse" }}
-            />
+            {/* Ambient glow layers behind portrait */}
+            <div className="absolute right-0 w-[520px] h-[520px] rounded-full bg-neon-green/8 blur-[80px] pointer-events-none -z-10"
+              style={{ animation: "ambientPulse 5s ease-in-out infinite" }} />
+            <div className="absolute right-8 w-[380px] h-[380px] rounded-full bg-neon-cyan/6 blur-[60px] pointer-events-none -z-10"
+              style={{ animation: "ambientPulse 7s ease-in-out infinite reverse" }} />
 
-            {/* HUD tick marks on outer ring */}
-            {[0, 60, 120, 180, 240, 300].map((deg) => (
-              <div
-                key={deg}
-                className="absolute w-[420px] h-[420px] pointer-events-none"
-                style={{ transform: `rotate(${deg}deg)` }}
-              >
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-3 bg-neon-green/50" />
-              </div>
-            ))}
+            {/* Portrait frame — no hard border, just glow + brackets */}
+            <div className="relative w-[30rem] h-[36rem] lg:w-[36rem] lg:h-[42rem]">
 
-            {/* Corner HUD data labels */}
-            <div className="absolute top-4 left-4 font-mono text-[10px] text-neon-green/60 leading-tight pointer-events-none">
-              <div>SYS: ONLINE</div>
-              <div>ID: MBK-001</div>
-            </div>
-            <div className="absolute top-4 right-4 font-mono text-[10px] text-neon-cyan/60 leading-tight text-right pointer-events-none">
-              <div>STACK: MERN</div>
-              <div>AI: ACTIVE</div>
-            </div>
-            <div className="absolute bottom-4 left-4 font-mono text-[10px] text-neon-pink/60 leading-tight pointer-events-none">
-              <div>MODE: DEV</div>
-              <div>STATUS: ●</div>
-            </div>
-            <div className="absolute bottom-4 right-4 font-mono text-[10px] text-neon-green/60 leading-tight text-right pointer-events-none">
-              <div>VER: 2.0</div>
-              <div>BUILD: OK</div>
-            </div>
+              {/* Soft glow halo — replaces the hard neon border */}
+              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-neon-green/20 via-neon-cyan/10 to-neon-pink/15 blur-2xl pointer-events-none" />
 
-            {/* Portrait frame */}
-        <div className="relative w-[28rem] h-[32rem] lg:w-[32rem] lg:h-[36rem]">
-              {/* Neon border glow layers */}
-              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-neon-green via-neon-cyan to-neon-pink opacity-60 blur-md pointer-events-none" />
-              <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-br from-neon-green via-neon-cyan to-neon-pink opacity-80 pointer-events-none" />
-
-              {/* Image container */}
-              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-cyber-darker">
+              {/* Image container — no border, clean clip */}
+              <div className="relative w-full h-full rounded-2xl overflow-hidden">
                 <img
                   src={musabImg}
                   alt="Musab"
                   className="w-full h-full object-cover object-top"
-                  style={{ filter: "brightness(0.95) contrast(1.05) saturate(1.1)" }}
+                  style={{ filter: "brightness(1.0) contrast(1.08) saturate(1.15)" }}
                 />
 
-                {/* Subtle color overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-cyber-darker/60 via-transparent to-neon-cyan/5 pointer-events-none" />
+                {/* Bottom fade into background */}
+                <div className="absolute inset-0 bg-gradient-to-t from-cyber-darker/70 via-transparent to-transparent pointer-events-none" />
 
-                {/* Scan lines */}
-                {/* <div
-                  className="absolute inset-0 pointer-events-none opacity-[0.06]"
-                  style={{
-                    backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(57,255,20,0.8) 3px, rgba(57,255,20,0.8) 4px)",
-                  }}
-                /> */}
+                {/* Subtle cyan tint at top */}
+                <div className="absolute inset-0 bg-gradient-to-b from-neon-cyan/5 via-transparent to-transparent pointer-events-none" />
 
                 {/* Animated scan sweep */}
                 <div
-                  className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-cyan/70 to-transparent pointer-events-none"
-                  style={{ animation: "scanSweep 4s ease-in-out infinite" }}
+                  className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-cyan/60 to-transparent pointer-events-none"
+                  style={{ animation: "scanSweep 5s ease-in-out infinite" }}
                 />
               </div>
 
-              {/* Corner brackets on frame */}
-              <div className="absolute -top-1 -left-1 w-5 h-5 border-l-2 border-t-2 border-neon-green rounded-tl pointer-events-none" />
-              <div className="absolute -top-1 -right-1 w-5 h-5 border-r-2 border-t-2 border-neon-cyan rounded-tr pointer-events-none" />
-              <div className="absolute -bottom-1 -left-1 w-5 h-5 border-l-2 border-b-2 border-neon-pink rounded-bl pointer-events-none" />
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 border-r-2 border-b-2 border-neon-green rounded-br pointer-events-none" />
-            </div>
+              {/* HUD corner brackets — larger, more prominent */}
+              {/* <div className="absolute -top-2 -left-2 w-8 h-8 border-l-2 border-t-2 border-neon-green pointer-events-none" />
+              <div className="absolute -top-2 -right-2 w-8 h-8 border-r-2 border-t-2 border-neon-cyan pointer-events-none" />
+              <div className="absolute -bottom-2 -left-2 w-8 h-8 border-l-2 border-b-2 border-neon-pink pointer-events-none" />
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 border-r-2 border-b-2 border-neon-green pointer-events-none" /> */}
 
-            {/* Ambient glow behind portrait */}
-            <div
-              className="absolute w-64 h-64 rounded-full bg-neon-green/10 blur-3xl pointer-events-none -z-10"
-              style={{ animation: "ambientPulse 4s ease-in-out infinite" }}
-            />
+              {/* HUD data labels */}
+              {/* <div className="absolute -top-6 left-0 font-mono text-[10px] text-neon-green/70 leading-tight pointer-events-none">
+                SYS: ONLINE &nbsp;|&nbsp; ID: MBK-001
+              </div>
+              <div className="absolute -bottom-6 right-0 font-mono text-[10px] text-neon-cyan/70 leading-tight text-right pointer-events-none">
+                STACK: MERN &nbsp;|&nbsp; AI: ACTIVE
+              </div> */}
+            </div>
           </motion.div>
         </div>
       </div>
