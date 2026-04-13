@@ -17,7 +17,7 @@ import projectRoutes from "./routes/projects.js";
 // import blogRoutes from "./routes/blog.js";
 import contactRoutes from "./routes/contact.js";
 // import aiRoutes from "./routes/ai.js";
-// import aiPlaygroundRoutes from "./routes/aiPlayground.routes.js";
+import aiPlaygroundRoutes from "./routes/aiPlayground.routes.js";
 
 // Load environment variables
 dotenv.config();
@@ -77,7 +77,7 @@ app.use("/api/projects", projectRoutes);
 // app.use("/api/posts", blogRoutes);
 app.use("/api/contact", contactRoutes);
 // app.use("/api/ai", aiRoutes);
-// app.use("/api/ai-playground", aiPlaygroundRoutes);
+app.use("/api/ai-playground", aiPlaygroundRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
