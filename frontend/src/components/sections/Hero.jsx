@@ -281,12 +281,12 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-cyber-darker/60 via-transparent to-neon-cyan/5 pointer-events-none" />
 
                 {/* Scan lines */}
-                <div
+                {/* <div
                   className="absolute inset-0 pointer-events-none opacity-[0.06]"
                   style={{
                     backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(57,255,20,0.8) 3px, rgba(57,255,20,0.8) 4px)",
                   }}
-                />
+                /> */}
 
                 {/* Animated scan sweep */}
                 <div

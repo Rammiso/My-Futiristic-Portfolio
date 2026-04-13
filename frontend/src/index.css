@@ -195,7 +195,7 @@ body {
     @apply relative px-6 py-3 font-semibold text-sm uppercase tracking-wider
            overflow-hidden transition-all duration-300;
     @apply bg-transparent border-2 border-neon-green text-neon-green;
-    @apply hover:bg-neon-green hover:text-black;
+    @apply hover:bg-neon-green hover:text-cyber-darker;
   }
 
   .cyber-card {

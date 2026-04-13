@@ -44,6 +44,7 @@ function App() {
             element={<Home theme={theme} toggleTheme={toggleTheme} />}
           />
           <Route path="/admin/login" element={<AdminLogin />} />
+          {/* <Route path="/admin/register" element={<AdminLogin />} /> */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>

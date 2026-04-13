@@ -164,7 +164,7 @@ const About = () => {
                 <div className="space-y-4 text-white/70 leading-relaxed">
                   <p>
                     I'm a{" "}
-                    <span className="text-neon-green font-semibold">Full Stack Developer</span>{" "}
+                    <span className="text-neon-green font-semibold">Software Engineer</span>{" "}
                     with a passion for creating innovative web applications that solve real-world
                     problems. My journey in software development started with a curiosity about
                     how things work, and it has evolved into a career focused on building
@@ -205,7 +205,7 @@ const About = () => {
                   {/* Portrait */}
                   <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-                    style={{
+                   style={{
                       backgroundImage: 'url("/MUSAB.png")',
                       filter: "brightness(0.9) contrast(1.1)",
                     }}

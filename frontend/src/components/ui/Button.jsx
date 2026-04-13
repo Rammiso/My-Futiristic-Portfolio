@@ -12,17 +12,16 @@ const Button = ({
   ...props
 }) => {
   const baseStyles =
-    "relative overflow-hidden font-semibold uppercase tracking-wider transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
+    "font-semibold uppercase tracking-wider transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants = {
     primary:
-      "bg-transparent border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-black before:absolute before:inset-0 before:bg-neon-green before:translate-x-full before:transition-transform before:duration-300 hover:before:translate-x-0",
+      "bg-transparent border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-black [&>*]:hover:text-black",
     secondary:
-      "bg-transparent border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black before:absolute before:inset-0 before:bg-neon-cyan before:translate-x-full before:transition-transform before:duration-300 hover:before:translate-x-0",
+      "bg-transparent border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black [&>*]:hover:text-black",
     outline:
       "bg-transparent border-2 border-white/20 hover:border-neon-green hover:text-neon-green",
-    solid:
-      "bg-neon-green text-black border-2 border-neon-green hover:bg-transparent hover:text-neon-green",
+    solid: "bg-neon-green text-black border-2 border-neon-green hover:bg-neon-green/80 hover:text-black hover:border-neon-green"
   };
 
   const sizes = {
@@ -41,7 +40,7 @@ const Button = ({
       whileTap={{ scale: disabled ? 1 : 0.98 }}
       {...props}
     >
-      <span className="relative z-10">{children}</span>
+      {children}
     </motion.button>
   );
 };
