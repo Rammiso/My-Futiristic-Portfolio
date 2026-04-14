@@ -15,94 +15,38 @@ import { FADE_IN_UP, STAGGER_CONTAINER } from "@utils/constants.js";
 import toast from "react-hot-toast";
 import api from "@utils/api.js";
 
-// CSS Globe — replaces Three.js HolographicGlobe (~500KB saved)
-const HolographicGlobe = () => (
-  <div className="relative w-full h-full flex items-center justify-center">
-    {/* Ambient glow */}
-    <div
-      className="absolute w-48 h-48 sm:w-64 sm:h-64 rounded-full pointer-events-none"
-      style={{
-        background: "radial-gradient(ellipse, rgba(0,255,255,0.15) 0%, transparent 70%)",
-        animation: "ambientPulse 4s ease-in-out infinite",
-      }}
+// Addis Ababa map embed — OpenStreetMap iframe, no API key needed
+const LocationMap = () => (
+  <div className="relative w-full h-full overflow-hidden rounded-lg">
+    {/* Map iframe */}
+    <iframe
+      title="Addis Ababa Location"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=38.6500%2C8.9200%2C38.8500%2C9.0800&layer=mapnik&marker=9.0054%2C38.7636"
+      className="w-full h-full border-0"
+      style={{ filter: "invert(90%) hue-rotate(180deg) saturate(0.8) brightness(0.85)" }}
+      loading="lazy"
+      referrerPolicy="no-referrer"
     />
 
-    {/* Orbital rings */}
-    {[
-      { size: "w-40 h-40 sm:w-52 sm:h-52", color: "#39FF14", duration: "8s", tilt: "rotateX(70deg)" },
-      { size: "w-52 h-52 sm:w-64 sm:h-64", color: "#00FFFF", duration: "12s", tilt: "rotateX(50deg) rotateY(20deg)" },
-      { size: "w-60 h-60 sm:w-72 sm:h-72", color: "#FF10F0", duration: "16s", tilt: "rotateX(80deg) rotateY(-10deg)" },
-    ].map((ring, i) => (
-      <div
-        key={i}
-        className={`absolute ${ring.size} rounded-full border pointer-events-none`}
-        style={{
-          borderColor: `${ring.color}50`,
-          transform: ring.tilt,
-          animation: `spin ${ring.duration} linear infinite`,
-          boxShadow: `0 0 8px ${ring.color}30`,
-        }}
-      />
-    ))}
+    {/* Overlay: neon border glow */}
+    <div className="absolute inset-0 rounded-lg pointer-events-none"
+      style={{ boxShadow: "inset 0 0 0 1px rgba(0,255,255,0.25), inset 0 0 24px rgba(57,255,20,0.06)" }}
+    />
 
-    {/* Globe wireframe */}
-    <div
-      className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border-2 pointer-events-none"
-      style={{
-        borderColor: "rgba(0,255,255,0.3)",
-        background: "radial-gradient(ellipse, rgba(0,255,255,0.05) 0%, transparent 70%)",
-        animation: "spin 20s linear infinite",
-        boxShadow: "0 0 20px rgba(0,255,255,0.2), inset 0 0 20px rgba(0,255,255,0.05)",
-      }}
-    >
-      {/* Latitude lines */}
-      {[25, 50, 75].map((pct) => (
-        <div
-          key={pct}
-          className="absolute left-0 right-0 border-t pointer-events-none"
-          style={{
-            top: `${pct}%`,
-            borderColor: "rgba(57,255,20,0.2)",
-          }}
-        />
-      ))}
-      {/* Longitude lines */}
-      {[25, 50, 75].map((pct) => (
-        <div
-          key={pct}
-          className="absolute top-0 bottom-0 border-l pointer-events-none"
-          style={{
-            left: `${pct}%`,
-            borderColor: "rgba(57,255,20,0.2)",
-          }}
-        />
-      ))}
-
-      {/* Location dot */}
-      <div
-        className="absolute w-3 h-3 rounded-full pointer-events-none"
-        style={{
-          top: "35%",
-          left: "60%",
-          backgroundColor: "#FF10F0",
-          boxShadow: "0 0 8px #FF10F0",
-          animation: "ambientPulse 2s ease-in-out infinite",
-        }}
-      />
+    {/* HUD label top-left */}
+    <div className="absolute top-2 left-2 flex items-center gap-1.5 pointer-events-none">
+      <div className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
+      <span className="text-[10px] font-mono text-neon-green uppercase tracking-wider bg-black/60 px-1.5 py-0.5 rounded">
+        Addis Ababa, ET
+      </span>
     </div>
 
-    {/* Scan line */}
-    <div
-      className="absolute left-0 right-0 h-px pointer-events-none"
-      style={{
-        background: "linear-gradient(90deg, transparent, rgba(0,255,255,0.6), transparent)",
-        animation: "scanSweepH 3s linear infinite",
-      }}
-    />
-
-    {/* Corner labels */}
-    <div className="absolute top-2 left-2 text-xs font-mono text-neon-cyan/50">LOC</div>
-    <div className="absolute bottom-2 right-2 text-xs font-mono text-neon-green/50">ETH</div>
+    {/* HUD label bottom-right */}
+    <div className="absolute bottom-2 right-2 pointer-events-none">
+      <span className="text-[10px] font-mono text-neon-cyan/70 bg-black/60 px-1.5 py-0.5 rounded">
+        9.0054° N · 38.7636° E
+      </span>
+    </div>
   </div>
 );
 
@@ -249,9 +193,9 @@ const Contact = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
             {/* Left: Globe + Contact Info */}
             <motion.div variants={FADE_IN_UP} className="space-y-6 sm:space-y-8">
-              {/* CSS Globe */}
-              <Card variant="glass" className="p-4 sm:p-8 h-56 sm:h-72 lg:h-80 relative overflow-hidden">
-                <HolographicGlobe />
+              {/* Map */}
+              <Card variant="glass" className="p-0 h-56 sm:h-72 lg:h-80 relative overflow-hidden">
+                <LocationMap />
               </Card>
 
               {/* Contact Info */}
@@ -387,16 +331,8 @@ const Contact = () => {
 
       <style>{`
         @keyframes ambientPulse {
-          0%, 100% { opacity: 0.6; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.05); }
-        }
-        @keyframes scanSweepH {
-          0% { top: 0%; }
-          100% { top: 100%; }
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
         }
       `}</style>
     </section>

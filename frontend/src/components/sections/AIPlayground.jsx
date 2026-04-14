@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { IoSend, IoTrash, IoCopy, IoCheckmark, IoSparkles } from "react-icons/io5";
 import Card from "@components/ui/Card.jsx";
@@ -174,12 +174,14 @@ const AIPlayground = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const bottomRef = useRef(null);
+  const scrollContainerRef = useRef(null);
   const textareaRef = useRef(null);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll the chat container (not the page) to bottom on new messages
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    container.scrollTop = container.scrollHeight;
   }, [messages, loading]);
 
   // Auto-resize textarea
@@ -192,8 +194,8 @@ const AIPlayground = () => {
 
   const buildHistory = () =>
     messages.map((m) => ({
-      role: m.role === "user" ? "user" : "model",
-      parts: [{ text: m.text }],
+      role: m.role === "user" ? "user" : "assistant",
+      content: m.text,
     }));
 
   const send = async (promptText) => {
@@ -269,12 +271,12 @@ const AIPlayground = () => {
           <div className="text-center mb-12">
             <motion.div variants={FADE_IN_UP} className="flex items-center justify-center gap-3 mb-4">
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-neon-green" />
-              <span className="text-sm font-mono text-neon-green uppercase tracking-wider">Gemini 2.0 Flash</span>
+              <span className="text-sm font-mono text-neon-green uppercase tracking-wider">LLaMA 3.3 · Groq</span>
               <div className="h-px w-12 bg-gradient-to-l from-transparent to-neon-green" />
             </motion.div>
             <motion.h2 variants={FADE_IN_UP} className="section-title">AI Playground</motion.h2>
             <motion.p variants={FADE_IN_UP} className="text-white/60 max-w-2xl mx-auto leading-relaxed">
-              Chat with Google's Gemini AI — ask anything, get instant answers
+              Chat with Llama AI — ask anything, get instant answers
             </motion.p>
           </div>
 
@@ -291,7 +293,7 @@ const AIPlayground = () => {
                     <div className="w-3 h-3 rounded-full bg-yellow-400/60" />
                     <div className="w-3 h-3 rounded-full bg-neon-green/60" />
                   </div>
-                  <span className="text-xs font-mono text-white/40">gemini-2.0-flash — text generation</span>
+                  <span className="text-xs font-mono text-white/40">llama-3.3-70b · groq inference</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
@@ -310,7 +312,7 @@ const AIPlayground = () => {
               </div>
 
               {/* Messages area */}
-              <div className="h-[420px] overflow-y-auto p-5 space-y-5 scrollbar-thin">
+              <div className="h-[420px] overflow-y-auto p-5 space-y-5 scrollbar-thin" ref={scrollContainerRef}>
                 {isEmpty ? (
                   /* Empty state */
                   <div className="h-full flex flex-col items-center justify-center gap-6">
@@ -344,7 +346,6 @@ const AIPlayground = () => {
                       <MessageBubble key={msg.id} msg={msg} />
                     ))}
                     {loading && <TypingIndicator />}
-                    <div ref={bottomRef} />
                   </>
                 )}
               </div>
@@ -376,7 +377,7 @@ const AIPlayground = () => {
                   </motion.button>
                 </div>
                 <p className="text-[10px] font-mono text-white/25 mt-2 text-center">
-                  Powered by Google Gemini 2.0 Flash · Responses may vary in accuracy
+                  Powered by LLaMA 3.3 70B via Groq · Responses may vary in accuracy
                 </p>
               </div>
             </Card>

@@ -5,6 +5,7 @@ import {
   generateImage,
   getModels,
   healthCheck,
+  listModels,
 } from "../controllers/aiPlayground.controller.js";
 
 const router = express.Router();
@@ -53,13 +54,8 @@ router.use(aiGenerationLimiter);
  * @access  Public
  */
 router.get("/health", healthCheck);
-
-/**
- * @route   GET /api/ai-playground/models
- * @desc    Get available AI models
- * @access  Public
- */
 router.get("/models", getModels);
+router.get("/list-models", listModels);
 
 /**
  * @route   POST /api/ai-playground/text

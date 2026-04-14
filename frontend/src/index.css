@@ -399,13 +399,9 @@ body {
   opacity: 0.12 !important;
 }
 
-/* --- Smooth theme transition on all elements --- */
-.light *,
-.light *::before,
-.light *::after {
-  transition-property: background-color, border-color, box-shadow, color;
-  transition-duration: 0.25s;
-  transition-timing-function: ease;
+/* --- Smooth theme transition: only on html root, CSS vars propagate instantly --- */
+html {
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* =============================================
