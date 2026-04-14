@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import {
   IoMail,
   IoCall,
@@ -15,98 +17,70 @@ import { FADE_IN_UP, STAGGER_CONTAINER } from "@utils/constants.js";
 import toast from "react-hot-toast";
 import api from "@utils/api.js";
 
-// Pure CSS location card — no iframe, no external deps, works everywhere
-const LocationMap = () => (
-  <div className="relative w-full h-full overflow-hidden rounded-lg bg-black/40 flex flex-col items-center justify-center gap-4">
+// Addis Ababa — MapLibre GL + OpenFreeMap (no API key, no iframe)
+const LocationMap = () => {
+  const containerRef = useRef(null);
 
-    {/* Subtle grid background */}
-    <div
-      className="absolute inset-0 pointer-events-none opacity-20"
-      style={{
-        backgroundImage: `
-          linear-gradient(rgba(0,255,255,0.3) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0,255,255,0.3) 1px, transparent 1px)
-        `,
-        backgroundSize: "32px 32px",
-      }}
-    />
+  useEffect(() => {
+    if (!containerRef.current) return;
 
-    {/* Radial glow behind pin */}
-    <div
-      className="absolute pointer-events-none"
-      style={{
-        width: "180px",
-        height: "180px",
-        background: "radial-gradient(ellipse, rgba(57,255,20,0.12) 0%, transparent 70%)",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -60%)",
-      }}
-    />
+    const map = new maplibregl.Map({
+      container: containerRef.current,
+      style: "https://tiles.openfreemap.org/styles/liberty",
+      center: [38.7636, 9.0054], // Addis Ababa [lng, lat]
+      zoom: 12,
+      attributionControl: false,
+    });
 
-    {/* Ping rings */}
-    {[1, 2, 3].map((i) => (
-      <div
-        key={i}
-        className="absolute rounded-full border border-neon-green/30 pointer-events-none"
-        style={{
-          width: `${i * 56}px`,
-          height: `${i * 56}px`,
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -65%)",
-          animation: `pingRing 2.4s ease-out ${i * 0.5}s infinite`,
-        }}
-      />
-    ))}
+    // Neon-green marker pin
+    const el = document.createElement("div");
+    el.style.cssText = `
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #39FF14;
+      border: 2px solid #fff;
+      box-shadow: 0 0 12px #39FF14, 0 0 24px rgba(57,255,20,0.5);
+    `;
 
-    {/* Pin */}
-    <div className="relative z-10 flex flex-col items-center" style={{ marginBottom: "16px" }}>
-      <div
-        className="w-5 h-5 rounded-full border-2 border-neon-green bg-neon-green/30 flex items-center justify-center"
-        style={{ boxShadow: "0 0 12px #39FF14, 0 0 24px rgba(57,255,20,0.4)" }}
-      >
-        <div className="w-2 h-2 rounded-full bg-neon-green" />
+    new maplibregl.Marker({ element: el })
+      .setLngLat([38.7636, 9.0054])
+      .setPopup(new maplibregl.Popup({ offset: 16 }).setText("Addis Ababa, Ethiopia"))
+      .addTo(map);
+
+    // Disable scroll zoom so page scrolling isn't hijacked
+    map.scrollZoom.disable();
+
+    return () => map.remove();
+  }, []);
+
+  return (
+    <div className="relative w-full h-full">
+      {/* Map container */}
+      <div ref={containerRef} className="w-full h-full rounded-lg" />
+
+      {/* HUD top-left */}
+      <div className="absolute top-2 left-2 flex items-center gap-1.5 pointer-events-none z-10">
+        <div className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
+        <span className="text-[10px] font-mono text-neon-green uppercase tracking-wider bg-black/60 px-1.5 py-0.5 rounded">
+          Addis Ababa, ET
+        </span>
       </div>
-      {/* Pin stem */}
-      <div className="w-px h-4 bg-gradient-to-b from-neon-green to-transparent" />
+
+      {/* HUD bottom-right */}
+      <div className="absolute bottom-2 right-2 pointer-events-none z-10">
+        <span className="text-[10px] font-mono text-neon-cyan/80 bg-black/60 px-1.5 py-0.5 rounded">
+          9.0054° N · 38.7636° E
+        </span>
+      </div>
+
+      {/* Neon border */}
+      <div
+        className="absolute inset-0 rounded-lg pointer-events-none z-10"
+        style={{ boxShadow: "inset 0 0 0 1px rgba(0,255,255,0.25)" }}
+      />
     </div>
-
-    {/* City label */}
-    <div className="relative z-10 text-center -mt-2">
-      <p className="text-white font-bold text-base tracking-wide">Addis Ababa</p>
-      <p className="text-neon-cyan/70 text-xs font-mono mt-0.5">Ethiopia · East Africa</p>
-    </div>
-
-    {/* HUD top-left */}
-    <div className="absolute top-2 left-2 flex items-center gap-1.5 pointer-events-none">
-      <div className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
-      <span className="text-[10px] font-mono text-neon-green uppercase tracking-wider bg-black/60 px-1.5 py-0.5 rounded">
-        Live Location
-      </span>
-    </div>
-
-    {/* HUD bottom-right */}
-    <div className="absolute bottom-2 right-2 pointer-events-none">
-      <span className="text-[10px] font-mono text-neon-cyan/70 bg-black/60 px-1.5 py-0.5 rounded">
-        9.0054° N · 38.7636° E
-      </span>
-    </div>
-
-    {/* Neon border */}
-    <div
-      className="absolute inset-0 rounded-lg pointer-events-none"
-      style={{ boxShadow: "inset 0 0 0 1px rgba(0,255,255,0.2)" }}
-    />
-
-    <style>{`
-      @keyframes pingRing {
-        0%   { opacity: 0.6; transform: translate(-50%, -65%) scale(1); }
-        100% { opacity: 0;   transform: translate(-50%, -65%) scale(2.2); }
-      }
-    `}</style>
-  </div>
-);
+  );
+};
 
 const ContactInfoItem = ({ icon: Icon, label, value, href, copyable, external }) => {
   const [copied, setCopied] = useState(false);
