@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
-import maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import { useState } from "react";
 import {
   IoMail,
   IoCall,
@@ -17,66 +15,43 @@ import { FADE_IN_UP, STAGGER_CONTAINER } from "@utils/constants.js";
 import toast from "react-hot-toast";
 import api from "@utils/api.js";
 
-// Addis Ababa — MapLibre GL + OpenFreeMap (no API key, no iframe)
+// Google Maps Embed — Addis Ababa
 const LocationMap = () => {
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: "https://tiles.openfreemap.org/styles/liberty",
-      center: [38.7636, 9.0054], // Addis Ababa [lng, lat]
-      zoom: 12,
-      attributionControl: false,
-    });
-
-    // Neon-green marker pin
-    const el = document.createElement("div");
-    el.style.cssText = `
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: #39FF14;
-      border: 2px solid #fff;
-      box-shadow: 0 0 12px #39FF14, 0 0 24px rgba(57,255,20,0.5);
-    `;
-
-    new maplibregl.Marker({ element: el })
-      .setLngLat([38.7636, 9.0054])
-      .setPopup(new maplibregl.Popup({ offset: 16 }).setText("Addis Ababa, Ethiopia"))
-      .addTo(map);
-
-    // Disable scroll zoom so page scrolling isn't hijacked
-    map.scrollZoom.disable();
-
-    return () => map.remove();
-  }, []);
-
+  const GOOGLE_MAPS_API_KEY = "AIzaSyBNmnoSKdGOnD6srpegwZw4NMWvIXAbbiQ";
+  
   return (
     <div className="relative w-full h-full">
-      {/* Map container */}
-      <div ref={containerRef} className="w-full h-full rounded-lg" />
+      {/* Google Maps iframe */}
+      <iframe
+        title="Addis Ababa Location"
+        width="100%"
+        height="100%"
+        style={{ border: 0, display: "block" }}
+        loading="lazy"
+        allowFullScreen
+        referrerPolicy="no-referrer-when-downgrade"
+        src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=Addis+Ababa,Ethiopia&zoom=12`}
+      />
 
       {/* HUD top-left */}
       <div className="absolute top-2 left-2 flex items-center gap-1.5 pointer-events-none z-10">
         <div className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
-        <span className="text-[10px] font-mono text-neon-green uppercase tracking-wider bg-black/60 px-1.5 py-0.5 rounded">
+        <span className="text-[10px] font-mono text-neon-green uppercase tracking-wider bg-black/80 px-1.5 py-0.5 rounded">
           Addis Ababa, ET
         </span>
       </div>
 
       {/* HUD bottom-right */}
       <div className="absolute bottom-2 right-2 pointer-events-none z-10">
-        <span className="text-[10px] font-mono text-neon-cyan/80 bg-black/60 px-1.5 py-0.5 rounded">
+        <span className="text-[10px] font-mono text-neon-cyan/90 bg-black/80 px-1.5 py-0.5 rounded">
           9.0054° N · 38.7636° E
         </span>
       </div>
 
-      {/* Neon border */}
+      {/* Neon border overlay */}
       <div
         className="absolute inset-0 rounded-lg pointer-events-none z-10"
-        style={{ boxShadow: "inset 0 0 0 1px rgba(0,255,255,0.25)" }}
+        style={{ boxShadow: "inset 0 0 0 1px rgba(0,255,255,0.3)" }}
       />
     </div>
   );
@@ -167,9 +142,14 @@ const Contact = () => {
   const labelClass = (field, color = "text-neon-green") =>
     `absolute left-4 transition-all pointer-events-none font-mono text-xs ${
       formData[field] || focusedField === field
-        ? `-top-2 px-2 bg-cyber-dark ${color}`
+        ? `-top-2 px-2 ${color}`
         : "top-3 text-white/50"
     }`;
+
+  const labelStyle = (field) =>
+    formData[field] || focusedField === field
+      ? { background: "var(--bg-card)" }
+      : {};
 
   return (
     <section id="contact" className="section-padding bg-cyber-darker relative overflow-hidden">
@@ -226,9 +206,9 @@ const Contact = () => {
             {/* Left: Globe + Contact Info */}
             <motion.div variants={FADE_IN_UP} className="space-y-6 sm:space-y-8">
               {/* Map */}
-              <Card variant="glass" className="p-0 h-56 sm:h-72 lg:h-80 relative overflow-hidden">
+              <div className="glass rounded-lg overflow-hidden relative" style={{ height: "280px" }}>
                 <LocationMap />
-              </Card>
+              </div>
 
               {/* Contact Info */}
               <motion.div variants={STAGGER_CONTAINER} className="space-y-3 sm:space-y-4">
@@ -263,7 +243,7 @@ const Contact = () => {
                       className={inputClass("name")}
                       placeholder="Name"
                     />
-                    <label className={labelClass("name", "text-neon-green")}>Full Name</label>
+                    <label className={labelClass("name", "text-neon-green")} style={labelStyle("name")}>Full Name</label>
                   </div>
 
                   {/* Email */}
@@ -279,7 +259,7 @@ const Contact = () => {
                       className={inputClass("email", "neon-cyan")}
                       placeholder="Email"
                     />
-                    <label className={labelClass("email", "text-neon-cyan")}>Email Address</label>
+                    <label className={labelClass("email", "text-neon-cyan")} style={labelStyle("email")}>Email Address</label>
                   </div>
 
                   {/* Subject */}
@@ -295,7 +275,7 @@ const Contact = () => {
                       className={inputClass("subject", "neon-pink")}
                       placeholder="Subject"
                     />
-                    <label className={labelClass("subject", "text-neon-pink")}>Subject</label>
+                    <label className={labelClass("subject", "text-neon-pink")} style={labelStyle("subject")}>Subject</label>
                   </div>
 
                   {/* Message */}
@@ -311,7 +291,7 @@ const Contact = () => {
                       className={`${inputClass("message")} resize-none`}
                       placeholder="Message"
                     />
-                    <label className={labelClass("message", "text-neon-green")}>Your Message</label>
+                    <label className={labelClass("message", "text-neon-green")} style={labelStyle("message")}>Your Message</label>
                   </div>
 
                   {/* Submit */}

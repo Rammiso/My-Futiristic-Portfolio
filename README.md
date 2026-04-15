@@ -9,7 +9,7 @@
 
 **Modern, cyberpunk-themed portfolio with 3D animations, AI integration, and admin dashboard**
 
-[Live Demo](#) • [Documentation](backend/README.md) • [Report Bug](#)
+[Live Demo](https://musab-hassen.vercel.app/) • [Documentation](backend/README.md) • [Report Bug](https://t.me/neuron_v1)
 
 </div>
 
@@ -81,7 +81,7 @@
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/musab-portfolio.git
+   git clone https://github.com/Rammiso/musab-portfolio.git
    cd musab-portfolio
    ```
 

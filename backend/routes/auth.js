@@ -16,7 +16,7 @@ const router = express.Router();
 
 // ⚠️ REGISTRATION DISABLED FOR SECURITY
 // Registration route is permanently disabled after admin account creation
-router.post("/register", register);
+// router.post("/register", register);
 
 // Public routes
 router.post("/login", loginLimiter, login);
